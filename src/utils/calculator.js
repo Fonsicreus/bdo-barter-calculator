@@ -1,0 +1,592 @@
+import { BARTER_TIERS } from "../data/barterTiers";
+
+/**
+ * Calculates the largest safe exchange count for a single barter offer.
+ *
+ * `currentShipWeight` is pre-loaded cargo only. It must exclude the input goods
+ * for this exchange, because those are added on top when the ship departs.
+ */
+export function calculateTrade(params) {
+  const {
+    shipMaxWeight,
+    currentShipWeight,
+    inputTier,
+    outputTier,
+    ownedQuantity,
+    ratioInput,
+    ratioOutput,
+    offerMaxTrades,
+    shipCapacityValid = true,
+  } = params;
+
+  const safeCurrentWeight =
+    Number.isFinite(currentShipWeight) && currentShipWeight > 0 ? currentShipWeight : 0;
+  const safeOwnedQuantity = Number.isFinite(ownedQuantity) && ownedQuantity > 0 ? ownedQuantity : 0;
+
+  const needsUnitWeight = [inputTier, outputTier].some(
+    (tier) =>
+      !Number.isFinite(tier?.unitWeight) ||
+      tier.unitWeight < 0 ||
+      (tier.unitWeight === 0 && tier.id !== "crow_coins"),
+  );
+  const needsRatio = [ratioInput, ratioOutput].some(
+    (ratio) => !Number.isInteger(ratio) || ratio <= 0,
+  );
+  const hasOfferLimit = typeof offerMaxTrades === "number";
+  const needsOfferLimit =
+    hasOfferLimit && (!Number.isInteger(offerMaxTrades) || offerMaxTrades <= 0);
+  const needsShipCapacity =
+    !shipCapacityValid || !Number.isFinite(shipMaxWeight) || shipMaxWeight <= 0;
+
+  if (needsUnitWeight || needsRatio || needsOfferLimit || needsShipCapacity) {
+    const currentPercentage =
+      !needsShipCapacity && safeCurrentWeight > 0
+        ? Math.round((safeCurrentWeight / shipMaxWeight) * 100)
+        : 0;
+    const remainingCapacity = needsShipCapacity
+      ? 0
+      : Math.max(0, shipMaxWeight - safeCurrentWeight);
+    const overCapacity = needsShipCapacity ? 0 : Math.max(0, safeCurrentWeight - shipMaxWeight);
+
+    return {
+      maxSafeTrades: 0,
+      recommendedInputCount: 0,
+      expectedOutputCount: 0,
+      weightAtDeparture: safeCurrentWeight,
+      weightAtArrival: safeCurrentWeight,
+      netWeightChange: 0,
+      remainingCapacityAtDeparture: remainingCapacity,
+      remainingCapacityAtArrival: remainingCapacity,
+      overCapacityAtDeparture: overCapacity,
+      overCapacityAtArrival: overCapacity,
+      departurePercentage: currentPercentage,
+      arrivalPercentage: currentPercentage,
+      isOverCapacityAtDeparture: !needsShipCapacity && safeCurrentWeight > shipMaxWeight,
+      isOverCapacityAtArrival: !needsShipCapacity && safeCurrentWeight > shipMaxWeight,
+      limitingFactor: needsShipCapacity ? "invalid_ship_capacity" : "missing_inputs",
+      needsUnitWeight,
+      needsRatio,
+      needsOfferLimit,
+      needsShipCapacity,
+    };
+  }
+
+  // Pre-loaded cargo is already on board. Input goods are loaded in addition,
+  // and outputs replace those inputs after the exchange.
+  const availableWeight = Math.max(0, shipMaxWeight - safeCurrentWeight);
+
+  const inputWeightPerExchange = ratioInput * inputTier.unitWeight;
+  const outputWeightPerExchange = ratioOutput * outputTier.unitWeight;
+
+  // Max exchanges possible based on owned materials.
+  const maxByOwned = ratioInput > 0 ? Math.floor(safeOwnedQuantity / ratioInput) : 0;
+
+  // Max exchanges before exceeding departure capacity with the input goods.
+  const maxByDeparture =
+    inputWeightPerExchange > 0
+      ? Math.floor(availableWeight / inputWeightPerExchange)
+      : Number.POSITIVE_INFINITY;
+
+  // Max exchanges before exceeding arrival capacity with the received goods.
+  const maxByArrival =
+    outputWeightPerExchange > 0
+      ? Math.floor(availableWeight / outputWeightPerExchange)
+      : Number.POSITIVE_INFINITY;
+
+  // Max exchanges allowed by this specific offer's remaining exchange cap.
+  // This is offer-specific data, not an island-wide node rule.
+  const maxByOffer =
+    hasOfferLimit && offerMaxTrades > 0 ? offerMaxTrades : Number.POSITIVE_INFINITY;
+
+  const limits = [
+    { factor: "offer_limit", value: maxByOffer },
+    { factor: "arrival_weight", value: maxByArrival },
+    { factor: "departure_weight", value: maxByDeparture },
+    { factor: "owned_quantity", value: maxByOwned },
+  ];
+
+  const maxSafeTrades = Math.max(0, Math.min(...limits.map((limit) => limit.value)));
+
+  let limitingFactor = "owned_quantity";
+  if (maxSafeTrades === 0) {
+    if (safeCurrentWeight > shipMaxWeight) {
+      limitingFactor = "already_overloaded";
+    } else if (availableWeight <= 0) {
+      limitingFactor = "no_free_capacity";
+    } else if (safeOwnedQuantity < ratioInput) {
+      limitingFactor = "no_owned_stock";
+    } else {
+      limitingFactor = "no_safe_trades";
+    }
+  } else {
+    const minLimit = Math.min(...limits.map((limit) => limit.value));
+    limitingFactor = limits.find((limit) => limit.value === minLimit)?.factor ?? "owned_quantity";
+  }
+
+  const recommendedInputCount = maxSafeTrades * ratioInput;
+  const expectedOutputCount = maxSafeTrades * ratioOutput;
+
+  const cargoDepartureWeight = recommendedInputCount * inputTier.unitWeight;
+  const cargoArrivalWeight = expectedOutputCount * outputTier.unitWeight;
+
+  const weightAtDeparture = safeCurrentWeight + cargoDepartureWeight;
+  const weightAtArrival = safeCurrentWeight + cargoArrivalWeight;
+  const netWeightChange = cargoArrivalWeight - cargoDepartureWeight;
+
+  const remainingCapacityAtDeparture = Math.max(0, shipMaxWeight - weightAtDeparture);
+  const remainingCapacityAtArrival = Math.max(0, shipMaxWeight - weightAtArrival);
+  const overCapacityAtDeparture = Math.max(0, weightAtDeparture - shipMaxWeight);
+  const overCapacityAtArrival = Math.max(0, weightAtArrival - shipMaxWeight);
+
+  const departurePercentage = Math.round((weightAtDeparture / shipMaxWeight) * 100);
+  const arrivalPercentage = Math.round((weightAtArrival / shipMaxWeight) * 100);
+
+  return {
+    maxSafeTrades,
+    recommendedInputCount,
+    expectedOutputCount,
+    weightAtDeparture,
+    weightAtArrival,
+    netWeightChange,
+    remainingCapacityAtDeparture,
+    remainingCapacityAtArrival,
+    overCapacityAtDeparture,
+    overCapacityAtArrival,
+    departurePercentage,
+    arrivalPercentage,
+    isOverCapacityAtDeparture: weightAtDeparture > shipMaxWeight,
+    isOverCapacityAtArrival: weightAtArrival > shipMaxWeight,
+    limitingFactor,
+    needsUnitWeight: false,
+    needsRatio: false,
+    needsOfferLimit: false,
+    needsShipCapacity: false,
+  };
+}
+
+function normalizeCount(value) {
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function resolveUnitWeight(explicitWeight, tierLevel) {
+  if (Number.isFinite(explicitWeight) && explicitWeight > 0) {
+    return explicitWeight;
+  }
+
+  const tier = BARTER_TIERS[tierLevel];
+  const tierWeight = tier?.unitWeight;
+  const isValidZeroWeight = tierWeight === 0 && tier.id === "crow_coins";
+  return Number.isFinite(tierWeight) && (tierWeight > 0 || isValidZeroWeight) ? tierWeight : null;
+}
+
+/**
+ * Simulates a chained barter route.
+ *
+ * Barter islands do not offer storage, so input goods that are not produced by
+ * an earlier stop are counted as loaded at the first port. Outputs remain on
+ * board and can satisfy later stops that require the same tier. Every stop is
+ * checked before the exchange (departure weight) and after it (arrival weight).
+ */
+export function simulateRoute(
+  stops,
+  shipMaxWeight,
+  initialCargoWeight = 0,
+  shipCapacityValid = true,
+) {
+  const safeInitialCargo =
+    Number.isFinite(initialCargoWeight) && initialCargoWeight > 0 ? initialCargoWeight : 0;
+  const isCapacityValid = shipCapacityValid && Number.isFinite(shipMaxWeight) && shipMaxWeight > 0;
+
+  const stopPlans = [];
+  const availableUnits = new Map();
+  let initialLoadWeight = 0;
+  let isInitialLoadKnown = true;
+  let hasMissingWeights = false;
+
+  for (const stop of stops) {
+    const inputGiven = normalizeCount(stop.tradeCount) * normalizeCount(stop.ratioInput);
+    const outputReceived = normalizeCount(stop.tradeCount) * normalizeCount(stop.ratioOutput);
+    const inputUnitWeight = resolveUnitWeight(stop.inputUnitWeight, stop.inputTierLevel);
+    const outputUnitWeight = resolveUnitWeight(stop.outputUnitWeight, stop.outputTierLevel);
+
+    const unitsAvailable = availableUnits.get(stop.inputTierLevel) ?? 0;
+    const inputFromPrevious = Math.min(inputGiven, unitsAvailable);
+    const inputLoadedUnits = inputGiven - inputFromPrevious;
+
+    let inputLoadedWeight = null;
+    if (inputUnitWeight !== null) {
+      inputLoadedWeight = inputLoadedUnits * inputUnitWeight;
+      initialLoadWeight += inputLoadedWeight;
+    } else if (inputLoadedUnits > 0) {
+      isInitialLoadKnown = false;
+    }
+
+    // Inputs consumed at this stop are no longer available for later stops.
+    availableUnits.set(stop.inputTierLevel, unitsAvailable - inputFromPrevious);
+    // Outputs go into the same pool and can be reused by a later stop.
+    availableUnits.set(
+      stop.outputTierLevel,
+      (availableUnits.get(stop.outputTierLevel) ?? 0) + outputReceived,
+    );
+
+    if (inputUnitWeight === null || outputUnitWeight === null) {
+      hasMissingWeights = true;
+    }
+
+    stopPlans.push({
+      stop,
+      inputGiven,
+      outputReceived,
+      inputUnitWeight,
+      outputUnitWeight,
+      inputFromPrevious,
+      inputLoadedUnits,
+      inputLoadedWeight,
+    });
+  }
+
+  const minimumStartWeight = safeInitialCargo + initialLoadWeight;
+  const startWeight = isInitialLoadKnown ? minimumStartWeight : null;
+  let currentWeight = startWeight;
+  let weightKnown = startWeight !== null;
+  let isOverweight = false;
+  let overweightAtStart = false;
+
+  // Even when some input weights are unknown, the known portion can already
+  // prove that the first departure is overloaded.
+  if (isCapacityValid && minimumStartWeight > shipMaxWeight) {
+    overweightAtStart = true;
+    isOverweight = true;
+  }
+
+  const stopsSummary = stopPlans.map((plan) => {
+    const weightBefore = currentWeight;
+    const departureOverCapacity =
+      isCapacityValid && weightBefore !== null && weightBefore > shipMaxWeight;
+
+    const inputTotalWeight =
+      plan.inputUnitWeight === null ? null : plan.inputGiven * plan.inputUnitWeight;
+    const outputTotalWeight =
+      plan.outputUnitWeight === null ? null : plan.outputReceived * plan.outputUnitWeight;
+
+    const weightAfter =
+      weightKnown && inputTotalWeight !== null && outputTotalWeight !== null
+        ? Math.max(0, currentWeight - inputTotalWeight + outputTotalWeight)
+        : null;
+
+    if (weightAfter === null) {
+      weightKnown = false;
+      currentWeight = null;
+    } else {
+      currentWeight = weightAfter;
+    }
+
+    const arrivalOverCapacity =
+      isCapacityValid && weightAfter !== null && weightAfter > shipMaxWeight;
+
+    if (departureOverCapacity || arrivalOverCapacity) {
+      isOverweight = true;
+    }
+
+    return {
+      ...plan,
+      weightBefore,
+      weightAfter,
+      isOverCapacityAtDeparture: departureOverCapacity,
+      isOverCapacityAtArrival: arrivalOverCapacity,
+      overCapacityAtDeparture:
+        isCapacityValid && weightBefore !== null ? Math.max(0, weightBefore - shipMaxWeight) : 0,
+      overCapacityAtArrival:
+        isCapacityValid && weightAfter !== null ? Math.max(0, weightAfter - shipMaxWeight) : 0,
+      hasMissingWeight: plan.inputUnitWeight === null || plan.outputUnitWeight === null,
+    };
+  });
+
+  const finalWeight = weightKnown ? currentWeight : null;
+
+  return {
+    initialCargoWeight: safeInitialCargo,
+    initialLoadWeight,
+    isInitialLoadKnown,
+    minimumStartWeight,
+    startWeight,
+    overweightAtStart,
+    totalCargoWeight: finalWeight,
+    remainingCapacity:
+      isCapacityValid && finalWeight !== null ? Math.max(0, shipMaxWeight - finalWeight) : null,
+    startPercentage:
+      isCapacityValid && startWeight !== null
+        ? Math.round((startWeight / shipMaxWeight) * 100)
+        : null,
+    finalPercentage:
+      isCapacityValid && finalWeight !== null
+        ? Math.round((finalWeight / shipMaxWeight) * 100)
+        : null,
+    isCapacityValid,
+    isOverweight,
+    hasMissingWeights,
+    isSafe: isCapacityValid && !isOverweight && !hasMissingWeights,
+    stopsSummary,
+  };
+}
+
+function getTierCargoWeight(inventory, tierWeights, preloadedWeight) {
+  let weight = preloadedWeight;
+  for (let tier = 1; tier <= 7; tier++) {
+    if (inventory[tier] > 0) {
+      weight += inventory[tier] * tierWeights[tier];
+    }
+  }
+  return weight;
+}
+
+export function calculateTierChain({
+  startTier,
+  targetTier,
+  shipMaxWeight,
+  preloadedCargoWeight = 0,
+  maxStartUnits = null,
+  ratios = {},
+  shipCapacityValid = true,
+}) {
+  const needsShipCapacity =
+    !shipCapacityValid || !Number.isFinite(shipMaxWeight) || shipMaxWeight <= 0;
+  const invalidPreloadedCargo = !Number.isFinite(preloadedCargoWeight) || preloadedCargoWeight < 0;
+  const invalidStartLimit =
+    maxStartUnits !== null &&
+    maxStartUnits !== undefined &&
+    (!Number.isSafeInteger(maxStartUnits) || maxStartUnits < 0);
+  const invalidTierRange =
+    !Number.isInteger(startTier) ||
+    !Number.isInteger(targetTier) ||
+    startTier < 1 ||
+    targetTier > 7 ||
+    targetTier <= startTier;
+
+  const missingRatioTiers = [];
+  const invalidOfferLimitTiers = [];
+  const stepRatios = {};
+
+  if (!invalidTierRange) {
+    for (let tier = startTier; tier < targetTier; tier++) {
+      const ratio = ratios[tier];
+      if (
+        !Number.isSafeInteger(ratio?.input) ||
+        ratio.input <= 0 ||
+        !Number.isSafeInteger(ratio?.output) ||
+        ratio.output <= 0
+      ) {
+        missingRatioTiers.push(tier);
+        continue;
+      }
+
+      if (
+        ratio.offerLimit !== null &&
+        ratio.offerLimit !== undefined &&
+        (!Number.isSafeInteger(ratio.offerLimit) || ratio.offerLimit <= 0)
+      ) {
+        invalidOfferLimitTiers.push(tier);
+      }
+
+      stepRatios[tier] = {
+        input: ratio.input,
+        output: ratio.output,
+        offerLimit: ratio.offerLimit ?? null,
+      };
+    }
+  }
+
+  const tierWeights = {};
+  for (let tier = startTier; !invalidTierRange && tier <= targetTier; tier++) {
+    const unitWeight = BARTER_TIERS[tier]?.unitWeight;
+    if (!Number.isFinite(unitWeight) || unitWeight <= 0) {
+      return {
+        plan: null,
+        needsShipCapacity,
+        invalidPreloadedCargo,
+        invalidStartLimit,
+        invalidTierRange,
+        missingRatioTiers,
+        invalidOfferLimitTiers,
+        invalidTierWeight: tier,
+        failureReason: null,
+      };
+    }
+    tierWeights[tier] = unitWeight;
+  }
+
+  const resultBase = {
+    plan: null,
+    needsShipCapacity,
+    invalidPreloadedCargo,
+    invalidStartLimit,
+    invalidTierRange,
+    missingRatioTiers,
+    invalidOfferLimitTiers,
+    invalidTierWeight: null,
+    failureReason: null,
+  };
+
+  if (
+    needsShipCapacity ||
+    invalidPreloadedCargo ||
+    invalidStartLimit ||
+    invalidTierRange ||
+    missingRatioTiers.length > 0 ||
+    invalidOfferLimitTiers.length > 0
+  ) {
+    return resultBase;
+  }
+
+  const startWeight = tierWeights[startTier];
+  const targetWeight = tierWeights[targetTier];
+  const maxStartingUnitsByCapacity = Math.floor(
+    Math.max(0, shipMaxWeight - preloadedCargoWeight) / startWeight,
+  );
+  const sourceUnitLimit =
+    maxStartUnits === null || maxStartUnits === undefined
+      ? maxStartingUnitsByCapacity
+      : Math.min(maxStartUnits, maxStartingUnitsByCapacity);
+
+  let maxTargetUnits = sourceUnitLimit;
+  for (let tier = startTier; tier < targetTier; tier++) {
+    const ratio = stepRatios[tier];
+    maxTargetUnits = Math.floor(maxTargetUnits / ratio.input) * ratio.output;
+  }
+  maxTargetUnits = Math.min(
+    maxTargetUnits,
+    Math.floor(Math.max(0, shipMaxWeight - preloadedCargoWeight) / targetWeight),
+  );
+
+  let bestPlan = null;
+  let sawSourceLimit = false;
+  let sawOfferLimit = false;
+  let sawCapacityLimit = false;
+
+  for (let targetGoal = maxTargetUnits; targetGoal >= 1; targetGoal--) {
+    const tradesByTier = {};
+    let requiredUnits = targetGoal;
+    let exceedsOfferLimit = false;
+
+    for (let tier = targetTier - 1; tier >= startTier; tier--) {
+      const ratio = stepRatios[tier];
+      const tradeCount = Math.ceil(requiredUnits / ratio.output);
+      if (ratio.offerLimit !== null && tradeCount > ratio.offerLimit) {
+        exceedsOfferLimit = true;
+        break;
+      }
+
+      tradesByTier[tier] = tradeCount;
+      requiredUnits = tradeCount * ratio.input;
+      if (!Number.isSafeInteger(requiredUnits)) {
+        exceedsOfferLimit = true;
+        break;
+      }
+    }
+
+    if (exceedsOfferLimit) {
+      sawOfferLimit = true;
+      continue;
+    }
+
+    const sourceUnits = requiredUnits;
+    if (sourceUnits > sourceUnitLimit) {
+      sawSourceLimit = true;
+      continue;
+    }
+
+    const inventory = Array(8).fill(0);
+    inventory[startTier] = sourceUnits;
+    const startCargoWeight = getTierCargoWeight(inventory, tierWeights, preloadedCargoWeight);
+    if (startCargoWeight > shipMaxWeight) {
+      sawCapacityLimit = true;
+      continue;
+    }
+
+    const steps = [];
+    let currentWeight = startCargoWeight;
+    let maxCargoWeight = startCargoWeight;
+    let isPlanSafe = true;
+
+    for (let tier = startTier; tier < targetTier; tier++) {
+      const ratio = stepRatios[tier];
+      const tradeCount = tradesByTier[tier];
+      const inputUnits = tradeCount * ratio.input;
+      const outputUnits = tradeCount * ratio.output;
+      if (
+        !Number.isSafeInteger(inputUnits) ||
+        !Number.isSafeInteger(outputUnits) ||
+        inventory[tier] < inputUnits
+      ) {
+        isPlanSafe = false;
+        sawCapacityLimit = true;
+        break;
+      }
+
+      const weightBefore = currentWeight;
+      inventory[tier] -= inputUnits;
+      inventory[tier + 1] += outputUnits;
+      const weightAfter = getTierCargoWeight(inventory, tierWeights, preloadedCargoWeight);
+      if (!Number.isFinite(weightAfter) || weightAfter > shipMaxWeight) {
+        isPlanSafe = false;
+        sawCapacityLimit = true;
+        break;
+      }
+
+      currentWeight = weightAfter;
+      maxCargoWeight = Math.max(maxCargoWeight, weightBefore, weightAfter);
+      steps.push({
+        fromTier: tier,
+        toTier: tier + 1,
+        tradeCount,
+        inputUnits,
+        outputUnits,
+        weightBefore,
+        weightAfter,
+        remainingCapacity: shipMaxWeight - weightAfter,
+      });
+    }
+
+    if (!isPlanSafe) continue;
+
+    const finalOutputUnits = inventory[targetTier];
+    const plan = {
+      startTier,
+      targetTier,
+      sourceUnits,
+      finalOutputUnits,
+      startCargoWeight,
+      finalCargoWeight: currentWeight,
+      maxCargoWeight,
+      remainingCapacityAtPeak: shipMaxWeight - maxCargoWeight,
+      steps,
+      remainingGoods: inventory
+        .map((units, tier) => ({ tier, units, unitWeight: tierWeights[tier] }))
+        .filter((good) => good.units > 0),
+    };
+
+    if (
+      !bestPlan ||
+      plan.finalOutputUnits > bestPlan.finalOutputUnits ||
+      (plan.finalOutputUnits === bestPlan.finalOutputUnits &&
+        plan.sourceUnits < bestPlan.sourceUnits) ||
+      (plan.finalOutputUnits === bestPlan.finalOutputUnits &&
+        plan.sourceUnits === bestPlan.sourceUnits &&
+        plan.maxCargoWeight < bestPlan.maxCargoWeight)
+    ) {
+      bestPlan = plan;
+    }
+  }
+
+  let failureReason = null;
+  if (!bestPlan) {
+    if (sawOfferLimit) failureReason = "offer_limit";
+    else if (sawSourceLimit || (maxStartUnits === 0 && sourceUnitLimit === 0)) {
+      failureReason = "source_limit";
+    } else if (sawCapacityLimit || sourceUnitLimit === 0 || maxTargetUnits === 0) {
+      failureReason = "capacity";
+    } else failureReason = "no_safe_chain";
+  }
+
+  return { ...resultBase, plan: bestPlan, failureReason };
+}
