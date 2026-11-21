@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { DEFAULT_SHIP, OFFICIAL_SHIPS } from "../data/ships";
+import { useLanguage } from "../i18n/LanguageContext";
 import { deleteCookie, getCookie, setCookie } from "../utils/cookies";
 
 const SHIP_ID_COOKIE = "bdo_ship_id";
@@ -7,6 +8,7 @@ const SHIP_MAX_WEIGHT_COOKIE = "bdo_ship_actual_max_weight_v2";
 const SHIP_CURRENT_CARGO_COOKIE = "bdo_ship_current_cargo";
 
 export function useShipConfig() {
+  const { t } = useLanguage();
   const [selectedShip, setSelectedShipState] = useState(() => {
     const savedId = getCookie(SHIP_ID_COOKIE);
     if (savedId) {
@@ -84,9 +86,12 @@ export function useShipConfig() {
 
   let maxWeightError = null;
   if (!Number.isFinite(maxWeight) || maxWeight <= 0) {
-    maxWeightError = "Enter the total max cargo shown in your ship's information window.";
+    maxWeightError = t("Enter the total max cargo shown in your ship's information window.");
   } else if (maxWeight < selectedShip.baseWeight) {
-    maxWeightError = `Must be at least the ${selectedShip.name} hull base of ${selectedShip.baseWeight.toLocaleString()} LT.`;
+    maxWeightError = t("Must be at least the {ship} hull base of {weight} LT.", {
+      ship: t(selectedShip.name),
+      weight: selectedShip.baseWeight.toLocaleString(),
+    });
   }
 
   return {

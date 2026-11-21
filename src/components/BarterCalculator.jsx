@@ -8,6 +8,7 @@ const NEXT_TIER_KEY = { 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7 };
 
 export function BarterCalculator({
   shipMaxWeight,
+  finalCargoLimit,
   currentShipWeight,
   shipCapacityValid,
   onAddStopToRoute,
@@ -67,6 +68,7 @@ export function BarterCalculator({
   const result = useMemo(() => {
     return calculateTrade({
       shipMaxWeight,
+      finalCargoLimit,
       currentShipWeight,
       inputTier: resolvedInputTier,
       outputTier: resolvedOutputTier,
@@ -78,6 +80,7 @@ export function BarterCalculator({
     });
   }, [
     shipMaxWeight,
+    finalCargoLimit,
     currentShipWeight,
     shipCapacityValid,
     resolvedInputTier,

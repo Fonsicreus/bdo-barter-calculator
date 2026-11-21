@@ -1,6 +1,7 @@
 import { ArrowRightLeft } from "lucide-react";
 import { useId } from "react";
 import { BARTER_TIERS, ORDERED_TIER_KEYS } from "../data/barterTiers";
+import { useLanguage } from "../i18n/LanguageContext";
 
 function parsePositiveInteger(rawValue) {
   if (rawValue.trim() === "") {
@@ -34,6 +35,7 @@ export function BarterTradeForm({
   offerLimit,
   onOfferLimitChange,
 }) {
+  const { t } = useLanguage();
   const customRatioInputId = useId();
   const customRatioOutputId = useId();
   const inputUnitWeightId = useId();
@@ -51,11 +53,12 @@ export function BarterTradeForm({
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-satella-silver-glow">
-              Barter Trade Parameters
+              {t("Barter Trade Parameters")}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Enter the exact goods, ratio, and exchange cap shown in the barter offer. The offer
-              always overrides the presets below.
+              {t(
+                "Enter the exact goods, ratio, and exchange cap shown in the barter offer. The offer always overrides the presets below.",
+              )}
             </p>
           </div>
         </div>
@@ -69,9 +72,11 @@ export function BarterTradeForm({
             htmlFor="source-tier-select"
             className="block text-xs font-semibold text-slate-700 dark:text-satella-silver flex items-center justify-between"
           >
-            <span>Source Material (Input)</span>
+            <span>{t("Source Material (Input)")}</span>
             <span className="font-mono text-purple-600 dark:text-satella-glow text-xs">
-              {inputUnitWeight === null ? "Enter exact LT/ea" : `${inputUnitWeight} LT/ea`}
+              {inputUnitWeight === null
+                ? t("Enter exact LT/ea")
+                : `${inputUnitWeight} ${t("LT/ea")}`}
             </span>
           </label>
           <select
@@ -86,9 +91,9 @@ export function BarterTradeForm({
           >
             {ORDERED_TIER_KEYS.map((k) => (
               <option key={`input-${k}`} value={k}>
-                {BARTER_TIERS[k].name} (
+                {t(BARTER_TIERS[k].name)} (
                 {BARTER_TIERS[k].unitWeight === null
-                  ? "variable LT"
+                  ? t("variable LT")
                   : `${BARTER_TIERS[k].unitWeight} LT`}
                 )
               </option>
@@ -102,9 +107,11 @@ export function BarterTradeForm({
             htmlFor="dest-tier-select"
             className="block text-xs font-semibold text-slate-700 dark:text-satella-silver flex items-center justify-between"
           >
-            <span>Received Material (Output)</span>
+            <span>{t("Received Material (Output)")}</span>
             <span className="font-mono text-purple-600 dark:text-satella-glow text-xs">
-              {outputUnitWeight === null ? "Enter exact LT/ea" : `${outputUnitWeight} LT/ea`}
+              {outputUnitWeight === null
+                ? t("Enter exact LT/ea")
+                : `${outputUnitWeight} ${t("LT/ea")}`}
             </span>
           </label>
           <select
@@ -119,9 +126,9 @@ export function BarterTradeForm({
           >
             {ORDERED_TIER_KEYS.map((k) => (
               <option key={`output-${k}`} value={k}>
-                {BARTER_TIERS[k].name} (
+                {t(BARTER_TIERS[k].name)} (
                 {BARTER_TIERS[k].unitWeight === null
-                  ? "variable LT"
+                  ? t("variable LT")
                   : `${BARTER_TIERS[k].unitWeight} LT`}
                 )
               </option>
@@ -138,7 +145,7 @@ export function BarterTradeForm({
                 htmlFor={inputUnitWeightId}
                 className="block text-xs font-semibold text-slate-700 dark:text-satella-silver"
               >
-                Exact input item weight (LT each)
+                {t("Exact input item weight (LT each)")}
               </label>
               <input
                 id={inputUnitWeightId}
@@ -153,7 +160,7 @@ export function BarterTradeForm({
                     Number.isFinite(parsedWeight) && parsedWeight > 0 ? parsedWeight : null,
                   );
                 }}
-                placeholder="Read the exact item's LT"
+                placeholder={t("Read the exact item's LT")}
                 className="w-full rounded-xl px-3.5 py-2.5 text-sm font-mono font-semibold border bg-slate-50 text-slate-900 border-slate-300 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border"
               />
             </div>
@@ -164,7 +171,7 @@ export function BarterTradeForm({
                 htmlFor={outputUnitWeightId}
                 className="block text-xs font-semibold text-slate-700 dark:text-satella-silver"
               >
-                Exact output item weight (LT each)
+                {t("Exact output item weight (LT each)")}
               </label>
               <input
                 id={outputUnitWeightId}
@@ -179,14 +186,15 @@ export function BarterTradeForm({
                     Number.isFinite(parsedWeight) && parsedWeight > 0 ? parsedWeight : null,
                   );
                 }}
-                placeholder="Read the exact item's LT"
+                placeholder={t("Read the exact item's LT")}
                 className="w-full rounded-xl px-3.5 py-2.5 text-sm font-mono font-semibold border bg-slate-50 text-slate-900 border-slate-300 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border"
               />
             </div>
           )}
           <p className="sm:col-span-2 text-xs text-slate-500 dark:text-slate-400">
-            Land goods and ship materials do not share one weight. Use the exact item selected at
-            the barter node.
+            {t(
+              "Land goods and ship materials do not share one weight. Use the exact item selected at the barter node.",
+            )}
           </p>
         </div>
       )}
@@ -197,11 +205,11 @@ export function BarterTradeForm({
           htmlFor="owned-quantity-input"
           className="block text-xs font-semibold text-slate-700 dark:text-satella-silver flex items-center justify-between"
         >
-          <span>Quantity Owned in Storage / Inventory</span>
+          <span>{t("Quantity Owned in Storage / Inventory")}</span>
           <span className="text-xs text-slate-400 dark:text-slate-500">
-            Total Weight:{" "}
+            {t("Total Weight:")}{" "}
             {inputUnitWeight === null
-              ? "enter the exact unit weight"
+              ? t("enter the exact unit weight")
               : `${(ownedQuantity * inputUnitWeight).toLocaleString()} LT`}
           </span>
         </label>
@@ -215,11 +223,11 @@ export function BarterTradeForm({
             onChange={(e) =>
               onOwnedQuantityChange(Math.max(0, Number.parseInt(e.target.value, 10) || 0))
             }
-            placeholder="e.g. 10"
+            placeholder={t("e.g. 10")}
             className="w-full rounded-xl px-3.5 py-2.5 text-sm font-mono font-semibold transition-colors duration-200 border bg-slate-50 text-slate-900 border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-satella-surface dark:text-satella-silver-glow dark:border-satella-border dark:focus:ring-satella-primary pr-20"
           />
           <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400 dark:text-purple-300 pointer-events-none">
-            units
+            {t("units")}
           </span>
         </div>
       </div>
@@ -228,12 +236,12 @@ export function BarterTradeForm({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="block text-xs font-semibold text-slate-700 dark:text-satella-silver">
-            Exchange Ratio (Input : Output)
+            {t("Exchange Ratio (Input : Output)")}
           </span>
           <span className="text-xs text-slate-400 dark:text-slate-500">
             {typicalRatios.length > 0
-              ? "Choose the offer ratio or enter a custom one"
-              : "Enter the exact ratio shown in the barter offer"}
+              ? t("Choose the offer ratio or enter a custom one")
+              : t("Enter the exact ratio shown in the barter offer")}
           </span>
         </div>
 
@@ -266,7 +274,7 @@ export function BarterTradeForm({
                 : "bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200 dark:bg-satella-surface dark:text-satella-silver dark:hover:bg-satella-hover dark:border-satella-border"
             }`}
           >
-            Custom
+            {t("Custom")}
           </button>
         </div>
 
@@ -278,7 +286,7 @@ export function BarterTradeForm({
                 htmlFor={customRatioInputId}
                 className="text-xs text-slate-400 dark:text-purple-300 block mb-1"
               >
-                Input Qty
+                {t("Input Qty")}
               </label>
               <input
                 id={customRatioInputId}
@@ -297,7 +305,7 @@ export function BarterTradeForm({
                 htmlFor={customRatioOutputId}
                 className="text-xs text-slate-400 dark:text-purple-300 block mb-1"
               >
-                Output Qty
+                {t("Output Qty")}
               </label>
               <input
                 id={customRatioOutputId}
@@ -314,8 +322,9 @@ export function BarterTradeForm({
         )}
 
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          Input goods are loaded on top of pre-loaded cargo. After the exchange, received goods
-          replace their weight. Ratios are presets only; the exact offer can differ.
+          {t(
+            "Input goods are loaded on top of pre-loaded cargo. After the exchange, received goods replace their weight. Ratios are presets only; the exact offer can differ.",
+          )}
         </p>
       </div>
 
@@ -330,7 +339,7 @@ export function BarterTradeForm({
               className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-slate-300 dark:bg-satella-surface dark:border-satella-border dark:checked:bg-satella-primary"
             />
             <span className="text-xs font-medium text-slate-700 dark:text-satella-silver">
-              Cap by this offer's remaining exchange limit
+              {t("Cap by this offer's remaining exchange limit")}
             </span>
           </label>
 
@@ -343,20 +352,23 @@ export function BarterTradeForm({
                 onChange={(e) => {
                   onOfferLimitChange(parsePositiveInteger(e.target.value));
                 }}
-                aria-label="Offer-specific exchange limit"
+                aria-label={t("Offer-specific exchange limit")}
                 className="w-16 rounded-lg px-2 py-1 text-xs font-mono font-bold text-center border bg-slate-50 text-slate-900 border-slate-300 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border"
               />
-              <span className="text-xs text-slate-400 dark:text-slate-500">remaining trades</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500">
+                {t("remaining trades")}
+              </span>
             </div>
           )}
         </div>
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-          Optional. The cap belongs to the individual barter offer, not to the island node. Leave
-          this off when the offer shows no remaining limit.
+          {t(
+            "Optional. The cap belongs to the individual barter offer, not to the island node. Leave this off when the offer shows no remaining limit.",
+          )}
         </p>
         {applyOfferLimit && offerLimit === null && (
           <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-            Enter the remaining exchange count shown for this specific offer.
+            {t("Enter the remaining exchange count shown for this specific offer.")}
           </p>
         )}
       </div>

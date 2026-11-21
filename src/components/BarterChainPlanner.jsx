@@ -1,20 +1,29 @@
 import { Route } from "lucide-react";
 import { useMemo, useState } from "react";
 import { BARTER_TIERS } from "../data/barterTiers";
-import { calculateTierChain } from "../utils/calculator";
+import { useLanguage } from "../i18n/LanguageContext";
+import { calculateAutomaticTierChain } from "../utils/calculator";
 import { BarterChainOfferEditor } from "./BarterChainOfferEditor";
 import { BarterChainResult } from "./BarterChainResult";
 
-const LEVELS = [1, 2, 3, 4, 5, 6, 7];
+const START_LEVELS = [1, 2, 3, 4, 5, 6];
 
 function parseNumber(rawValue) {
-  return rawValue.trim() === "" ? null : Number(rawValue);
+  if (rawValue.trim() === "") return null;
+  const parsed = Number(rawValue);
+  return Number.isFinite(parsed) ? parsed : Number.NaN;
 }
 
-export function BarterChainPlanner({ shipMaxWeight, currentShipWeight, shipCapacityValid }) {
+export function BarterChainPlanner({
+  shipMaxWeight,
+  currentShipWeight,
+  shipCapacityValid,
+  finalCargoLimit,
+}) {
+  const { t } = useLanguage();
   const [startTier, setStartTier] = useState(2);
-  const [targetTier, setTargetTier] = useState(5);
-  const [maxStartUnitsRaw, setMaxStartUnitsRaw] = useState("");
+  const [targetTier, setTargetTier] = useState(7);
+  const [startUnitsRaw, setStartUnitsRaw] = useState("1");
   const [ratioInputs, setRatioInputs] = useState({});
 
   const steps = useMemo(
@@ -27,11 +36,17 @@ export function BarterChainPlanner({ shipMaxWeight, currentShipWeight, shipCapac
       Object.fromEntries(
         steps.map((tier) => {
           const values = ratioInputs[tier] ?? {};
+          const defaultRatio = BARTER_TIERS[tier].typicalRatios[0];
+          const selectedRatio =
+            values.mode === "custom"
+              ? { input: parseNumber(values.input ?? ""), output: parseNumber(values.output ?? "") }
+              : (BARTER_TIERS[tier].typicalRatios[values.presetIndex ?? 0] ?? defaultRatio);
+
           return [
             tier,
             {
-              input: parseNumber(values.input ?? ""),
-              output: parseNumber(values.output ?? ""),
+              input: selectedRatio?.input ?? null,
+              output: selectedRatio?.output ?? null,
               offerLimit: parseNumber(values.offerLimit ?? ""),
             },
           ];
@@ -42,21 +57,23 @@ export function BarterChainPlanner({ shipMaxWeight, currentShipWeight, shipCapac
 
   const result = useMemo(
     () =>
-      calculateTierChain({
+      calculateAutomaticTierChain({
         startTier,
         targetTier,
+        startUnits: parseNumber(startUnitsRaw),
         shipMaxWeight,
+        finalCargoLimit,
         preloadedCargoWeight: currentShipWeight,
-        maxStartUnits: parseNumber(maxStartUnitsRaw),
         ratios,
         shipCapacityValid,
       }),
     [
       startTier,
       targetTier,
+      startUnitsRaw,
       shipMaxWeight,
+      finalCargoLimit,
       currentShipWeight,
-      maxStartUnitsRaw,
       ratios,
       shipCapacityValid,
     ],
@@ -69,47 +86,72 @@ export function BarterChainPlanner({ shipMaxWeight, currentShipWeight, shipCapac
     }));
   };
 
-  const resetOfferValues = () => setRatioInputs({});
+  const selectRatio = (tier, value) => {
+    setRatioInputs((previous) => {
+      const current = previous[tier] ?? {};
+      if (value === "custom") {
+        const defaultRatio = BARTER_TIERS[tier].typicalRatios[0] ?? {};
+        return {
+          ...previous,
+          [tier]: {
+            ...current,
+            mode: "custom",
+            input: current.input ?? String(defaultRatio.input ?? ""),
+            output: current.output ?? String(defaultRatio.output ?? ""),
+          },
+        };
+      }
+
+      return {
+        ...previous,
+        [tier]: { ...current, mode: "preset", presetIndex: Number(value) },
+      };
+    });
+  };
 
   return (
-    <section className="rounded-2xl p-5 sm:p-6 transition-colors duration-300 border bg-white border-slate-200/80 shadow-sm dark:bg-satella-card dark:border-satella-border/80 dark:shadow-satella-card space-y-5">
-      <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-satella-border/60">
-        <div className="p-2 rounded-xl bg-purple-50 text-purple-600 dark:bg-satella-surface dark:text-satella-primary">
-          <Route className="w-5 h-5" />
+    <section className="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-colors duration-300 dark:border-satella-border/80 dark:bg-satella-card dark:shadow-satella-card sm:p-6">
+      <div className="flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-satella-border/60">
+        <div className="rounded-xl bg-purple-50 p-2 text-purple-600 dark:bg-satella-surface dark:text-satella-primary">
+          <Route className="h-5 w-5" />
         </div>
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-satella-silver-glow">
-            Multi-Tier Barter Chain Planner
+            {t("Automatic Barter Chain")}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Enter each exact offer ratio. The planner finds the smallest starting load for the
-            largest safe final batch and checks cargo after every exchange.
+            {t(
+              "Enter the goods you start with. The calculator chains every possible tier and stops when cargo space, stock, or an offer limit prevents the next exchange.",
+            )}
+          </p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            {t("The planner finds how many goods to load to maximize the selected final level.")}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="space-y-2">
           <label
             htmlFor="chain-start-tier"
             className="block text-xs font-semibold text-slate-700 dark:text-satella-silver"
           >
-            Starting good
+            {t("Starting goods")}
           </label>
           <select
             id="chain-start-tier"
             value={startTier}
             onChange={(event) => {
-              const nextTier = Number(event.target.value);
-              setStartTier(nextTier);
-              if (nextTier >= targetTier) setTargetTier(nextTier + 1);
-              resetOfferValues();
+              const tier = Number(event.target.value);
+              setStartTier(tier);
+              if (tier >= targetTier) setTargetTier(tier + 1);
             }}
-            className="w-full rounded-xl px-3 py-2.5 text-sm border bg-slate-50 text-slate-900 border-slate-300 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border"
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-satella-border dark:bg-satella-surface dark:text-satella-silver"
           >
-            {LEVELS.slice(0, 6).map((tier) => (
+            {START_LEVELS.map((tier) => (
               <option key={tier} value={tier}>
-                Level {tier} ({BARTER_TIERS[tier].unitWeight.toLocaleString()} LT each)
+                {t("Level")} {tier} ({BARTER_TIERS[tier].unitWeight.toLocaleString()}{" "}
+                {t("LT each)")}
               </option>
             ))}
           </select>
@@ -120,64 +162,65 @@ export function BarterChainPlanner({ shipMaxWeight, currentShipWeight, shipCapac
             htmlFor="chain-target-tier"
             className="block text-xs font-semibold text-slate-700 dark:text-satella-silver"
           >
-            Final good
+            {t("Maximum level")}
           </label>
           <select
             id="chain-target-tier"
             value={targetTier}
-            onChange={(event) => {
-              setTargetTier(Number(event.target.value));
-              resetOfferValues();
-            }}
-            className="w-full rounded-xl px-3 py-2.5 text-sm border bg-slate-50 text-slate-900 border-slate-300 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border"
+            onChange={(event) => setTargetTier(Number(event.target.value))}
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-satella-border dark:bg-satella-surface dark:text-satella-silver"
           >
-            {LEVELS.filter((tier) => tier > startTier).map((tier) => (
-              <option key={tier} value={tier}>
-                Level {tier} ({BARTER_TIERS[tier].unitWeight.toLocaleString()} LT each)
-              </option>
-            ))}
+            {Array.from({ length: 7 - startTier }, (_, index) => startTier + index + 1).map(
+              (tier) => (
+                <option key={tier} value={tier}>
+                  {t("Level")} {tier} ({BARTER_TIERS[tier].unitWeight.toLocaleString()}{" "}
+                  {t("LT each)")}
+                </option>
+              ),
+            )}
           </select>
         </div>
 
         <div className="space-y-2">
           <label
-            htmlFor="chain-available-start"
+            htmlFor="chain-start-units"
             className="block text-xs font-semibold text-slate-700 dark:text-satella-silver"
           >
-            Maximum starting units available (optional)
+            {t("Starting goods available")}
           </label>
-          <input
-            id="chain-available-start"
-            type="number"
-            min={0}
-            step={1}
-            inputMode="numeric"
-            value={maxStartUnitsRaw}
-            onChange={(event) => setMaxStartUnitsRaw(event.target.value)}
-            placeholder="No stock limit"
-            className="w-full rounded-xl px-3 py-2.5 text-sm font-mono border bg-slate-50 text-slate-900 border-slate-300 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border"
-          />
+          <div className="relative">
+            <input
+              id="chain-start-units"
+              type="number"
+              min={0}
+              step={1}
+              inputMode="numeric"
+              value={startUnitsRaw}
+              onChange={(event) => setStartUnitsRaw(event.target.value)}
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 pr-20 font-mono text-sm text-slate-900 dark:border-satella-border dark:bg-satella-surface dark:text-satella-silver"
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+              {t("units")}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {t("Weight of available goods:")}{" "}
+            {startUnitsRaw && Number.isFinite(Number(startUnitsRaw))
+              ? (Number(startUnitsRaw) * BARTER_TIERS[startTier].unitWeight).toLocaleString()
+              : "—"}{" "}
+            {t("LT; the recommended load is calculated below.")}
+          </p>
         </div>
       </div>
 
       <BarterChainOfferEditor
         steps={steps}
         ratioInputs={ratioInputs}
+        onSelectRatio={selectRatio}
         onUpdateStepValue={updateStepValue}
       />
 
-      <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-3 text-xs text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/20 dark:text-blue-200">
-        Every good from earlier legs stays aboard until traded. The starting load includes only the
-        calculated source units plus your pre-loaded cargo; surplus goods from each ratio remain in
-        the weight check.
-      </div>
-
-      <BarterChainResult
-        result={result}
-        startTier={startTier}
-        targetTier={targetTier}
-        shipMaxWeight={shipMaxWeight}
-      />
+      <BarterChainResult result={result} startTier={startTier} shipMaxWeight={shipMaxWeight} />
     </section>
   );
 }

@@ -4,8 +4,9 @@ A high-performance web application designed for Black Desert Online (BDO) captai
 
 ## Version 1.1
 
-- Added a multi-tier chain planner that calculates the minimum starting load for the largest safe final batch, using exact ratios and optional offer limits entered by the player.
-- The chain planner accounts for leftover goods and checks cargo weight after every exchange.
+- Three menus separate single trades, automatic tier chains, and custom routes with multiple exchanges. A route can mix linked and independent trades; the user must confirm the items are the same before reusing an earlier output, since levels alone do not identify items.
+- Added an automatic multi-tier chain planner: enter the starting level, maximum level and quantity to see each exchange and the cargo weight at every stage.
+- Typical offer ratios are applied by default; custom ratios and each offer's remaining exchange limit can be entered when the in-game offer differs.
 - Increased small text sizes and removed cookie-storage notices from the interface.
 
 Features a dark theme inspired by **Satella (The Witch of Envy from Re:Zero)** with deep obsidian void backgrounds, glowing amethyst/violet highlights, and ethereal silver accents.
@@ -89,7 +90,9 @@ Sources: Pearl Abyss [April 16, 2026 barter update](https://www.naeu.playblackde
 - The **hull base** is displayed for reference only and must not be added again.
 - **Pre-loaded Cargo** is existing cargo, sailor food, or supplies. It must exclude the goods being exchanged. The calculator counts input goods on top of pre-loaded cargo for departure and replaces them with received goods at arrival.
 - Multi-stop route simulation loads inputs that are not produced by an earlier stop at the first port, because barter islands do not provide storage.
-- The multi-tier chain planner requires an exact ratio for each leg, can apply each offer's remaining limit, and includes ratio leftovers in every cargo-capacity check.
+- The multi-tier chain planner treats the starting quantity as available stock and recommends the smallest load that maximizes the output at the selected level. It checks intermediate leftovers, offer limits and cargo throughout the chain. It also shows extra cargo that could be carried unchanged using the space free at peak load; alternatives must not be combined without recalculating their total weight. Ratios are presets and should be adjusted to match the offers.
+- The language selector switches the interface between English and Spanish and remembers the selection on this device.
+- Optional final-overload simulation caps the final cargo at 150% of normal capacity, a provisional planning assumption rather than a verified game limit. Each exchange must start within normal capacity. The multi-stop route planner applies the same final exchange restriction. [Black Desert Foundry's bartering guide](https://www.blackdesertfoundry.com/bartering-guide/) says a ship cannot barter while overweight and Breezy Sail does not work when overweight.
 
 ### Validation
 
@@ -100,4 +103,4 @@ bun run build
 bun run doctor
 ```
 
-There is no automated `test` script in `package.json`. Manual checks should cover a valid custom capacity, an invalid capacity below the hull base, a variable-weight item without an entered weight, an offer cap, a multi-stop route with an overloaded leg, and a Level 2 to Level 5 chain with exact ratios and limited cargo.
+There is no automated `test` script in `package.json`. Manual checks should cover a valid custom capacity, an invalid capacity below the hull base, a variable-weight item without an entered weight, an offer cap, a multi-stop route with an overloaded leg, and an automatic chain from a fixed starting quantity with limited cargo and leftover goods.
