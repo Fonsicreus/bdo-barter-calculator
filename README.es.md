@@ -1,6 +1,6 @@
 # BDO Barter Calculator
 
-[English](README.md) · **Español**
+[English](README.md) · **Español** · [한국어](README.ko.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md)
 
 Calcula qué llevar al salir del puerto, cuánto pesará la carga después de cada isla y con cuántos objetos podrás volver. Satella mantiene este planificador no oficial de Black Desert Online.
 

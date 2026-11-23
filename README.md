@@ -1,6 +1,6 @@
 # BDO Barter Calculator
 
-**English** · [Español](README.es.md)
+**English** · [Español](README.es.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md)
 
 Work out what to load at port, how heavy your cargo will be after each island, and how many goods you can bring home. Satella maintains this unofficial Black Desert Online planner.
 
@@ -32,7 +32,7 @@ The base weights and NPC sale prices below follow the April 16, 2026 Pearl Abyss
 | 7 | 2,000 LT | 100,000,000 Silver |
 
 - Use the quantities and remaining exchange count shown on the individual in-game offer. The header's **Debug** button enables custom ratios for supported offers.
-- Level 0 → 1 uses one Level 1 good per completed exchange. Enter the number of exchanges and include the land materials in **Pre-loaded Cargo**. Their weight remains in the estimate throughout the route.
+- Level 0 → 1 yields one Level 1 good per completed exchange. Enter the number of exchanges and include the land materials in **Pre-loaded Cargo**. Their weight remains in the estimate throughout the route.
 - Ship materials have item-specific weights. Crow Coin payouts vary by offer. For Level 5 sales, check whether the item is tagged **Great Ocean**.
 - The planner matches goods by tier when it reuses earlier outputs. Confirm that the items are the exact ones requested by the next offer.
 
