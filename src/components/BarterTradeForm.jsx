@@ -13,6 +13,7 @@ function parsePositiveInteger(rawValue) {
 }
 
 export function BarterTradeForm({
+  debugEnabled = false,
   inputTierKey,
   onInputTierChange,
   outputTierKey,
@@ -124,22 +125,24 @@ export function BarterTradeForm({
             }}
             className="w-full rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors duration-200 border bg-slate-50 text-slate-900 border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border dark:focus:ring-satella-primary"
           >
-            {ORDERED_TIER_KEYS.map((k) => (
-              <option key={`output-${k}`} value={k}>
-                {t(BARTER_TIERS[k].name)} (
-                {BARTER_TIERS[k].unitWeight === null
-                  ? t("variable LT")
-                  : `${BARTER_TIERS[k].unitWeight} LT`}
-                )
-              </option>
-            ))}
+            {ORDERED_TIER_KEYS.filter((k) => k !== 0 && (inputTierKey !== 0 || k === 1)).map(
+              (k) => (
+                <option key={`output-${k}`} value={k}>
+                  {t(BARTER_TIERS[k].name)} (
+                  {BARTER_TIERS[k].unitWeight === null
+                    ? t("variable LT")
+                    : `${BARTER_TIERS[k].unitWeight} LT`}
+                  )
+                </option>
+              ),
+            )}
           </select>
         </div>
       </div>
 
       {(inputTier.unitWeight === null || outputTier.unitWeight === null) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {inputTier.unitWeight === null && (
+          {inputTier.unitWeight === null && inputTierKey !== 0 && (
             <div className="space-y-2">
               <label
                 htmlFor={inputUnitWeightId}
@@ -205,12 +208,20 @@ export function BarterTradeForm({
           htmlFor="owned-quantity-input"
           className="block text-xs font-semibold text-slate-700 dark:text-satella-silver flex items-center justify-between"
         >
-          <span>{t("Quantity Owned in Storage / Inventory")}</span>
+          <span>
+            {t(
+              inputTierKey === 0
+                ? "Number of Tier 0 exchanges"
+                : "Quantity Owned in Storage / Inventory",
+            )}
+          </span>
           <span className="text-xs text-slate-400 dark:text-slate-500">
             {t("Total Weight:")}{" "}
-            {inputUnitWeight === null
-              ? t("enter the exact unit weight")
-              : `${(ownedQuantity * inputUnitWeight).toLocaleString()} LT`}
+            {inputTierKey === 0
+              ? t("Included in pre-loaded cargo")
+              : inputUnitWeight === null
+                ? t("enter the exact unit weight")
+                : `${(ownedQuantity * inputUnitWeight).toLocaleString()} LT`}
           </span>
         </label>
         <div className="relative">
@@ -265,21 +276,29 @@ export function BarterTradeForm({
             );
           })}
 
-          <button
-            type="button"
-            onClick={onEnableCustomRatio}
-            className={`py-2 px-3 rounded-xl text-xs font-mono font-bold transition-colors duration-200 border ${
-              isCustomRatio
-                ? "bg-purple-600 text-white border-purple-600 dark:bg-satella-primary dark:text-satella-void dark:border-satella-primary shadow-sm dark:shadow-satella-glow"
-                : "bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200 dark:bg-satella-surface dark:text-satella-silver dark:hover:bg-satella-hover dark:border-satella-border"
-            }`}
-          >
-            {t("Custom")}
-          </button>
+          {debugEnabled && inputTierKey !== 0 && (
+            <button
+              type="button"
+              onClick={onEnableCustomRatio}
+              className={`py-2 px-3 rounded-xl text-xs font-mono font-bold transition-colors duration-200 border ${
+                isCustomRatio
+                  ? "bg-purple-600 text-white border-purple-600 dark:bg-satella-primary dark:text-satella-void dark:border-satella-primary shadow-sm dark:shadow-satella-glow"
+                  : "bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200 dark:bg-satella-surface dark:text-satella-silver dark:hover:bg-satella-hover dark:border-satella-border"
+              }`}
+            >
+              {t("Custom")}
+            </button>
+          )}
         </div>
 
+        {!debugEnabled && typicalRatios.length === 0 && (
+          <p className="text-xs text-amber-700 dark:text-amber-300">
+            {t("No preset is available for this offer. Enable debug mode to enter its ratio.")}
+          </p>
+        )}
+
         {/* Custom Ratio Inputs */}
-        {isCustomRatio && (
+        {debugEnabled && inputTierKey !== 0 && isCustomRatio && (
           <div className="flex items-center gap-2 pt-2 animate-fadeIn">
             <div className="flex-1">
               <label

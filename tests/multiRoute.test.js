@@ -74,8 +74,9 @@ describe("mixed multi-trade routes", () => {
     expect(disabled.isOverweight).toBe(true);
     const beforeFinal = simulateRoute([finalTrade, makeStop(6, 7, 1, 1)], 11500, 0, true, 17250);
     expect(beforeFinal.isOverweight).toBe(true);
-    const tooMany = simulateRoute([makeStop(1, 2, 1, 3, 11)], 11500, 0, true, 17250);
-    expect(tooMany.stopsSummary[0].tooHeavyBeforeLast).toBe(true);
+    const batch = simulateRoute([makeStop(1, 2, 1, 3, 11)], 11500, 0, true, 17250);
+    expect(batch.isOverweight).toBe(false);
+    const tooMany = simulateRoute([makeStop(1, 2, 1, 3, 15)], 11500, 0, true, 17250);
     expect(tooMany.isOverweight).toBe(true);
   });
 });

@@ -11,7 +11,7 @@ export const BARTER_TIERS = {
     unitWeight: null,
     description:
       "Land-item weights and barter quantities vary by item and offer; enter the exact values shown in-game.",
-    typicalRatios: [],
+    typicalRatios: [{ input: 1, output: 1 }],
     isTradeGood: false,
   },
   1: {

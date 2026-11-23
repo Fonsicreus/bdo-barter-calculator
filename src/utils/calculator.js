@@ -29,7 +29,7 @@ export function calculateTrade(params) {
     (tier) =>
       !Number.isFinite(tier?.unitWeight) ||
       tier.unitWeight < 0 ||
-      (tier.unitWeight === 0 && tier.id !== "crow_coins"),
+      (tier.unitWeight === 0 && tier.id !== "crow_coins" && tier.id !== 0),
   );
   const needsRatio = [ratioInput, ratioOutput].some(
     (ratio) => !Number.isInteger(ratio) || ratio <= 0,
@@ -98,11 +98,6 @@ export function calculateTrade(params) {
     outputWeightPerExchange > 0
       ? Math.floor(Math.max(0, finalLimit - safeCurrentWeight) / outputWeightPerExchange)
       : Number.POSITIVE_INFINITY;
-  const deltaPerExchange = outputWeightPerExchange - inputWeightPerExchange;
-  const maxBeforeLast =
-    deltaPerExchange > 0
-      ? Math.floor((availableWeight + deltaPerExchange) / outputWeightPerExchange)
-      : Number.POSITIVE_INFINITY;
 
   // Max exchanges allowed by this specific offer's remaining exchange cap.
   // This is offer-specific data, not an island-wide node rule.
@@ -112,12 +107,14 @@ export function calculateTrade(params) {
   const limits = [
     { factor: "offer_limit", value: maxByOffer },
     { factor: "arrival_weight", value: maxByArrival },
-    { factor: "before_last_weight", value: maxBeforeLast },
     { factor: "departure_weight", value: maxByDeparture },
     { factor: "owned_quantity", value: maxByOwned },
   ];
 
-  const maxSafeTrades = Math.max(0, Math.min(...limits.map((limit) => limit.value)));
+  const maxSafeTrades =
+    safeCurrentWeight > shipMaxWeight
+      ? 0
+      : Math.max(0, Math.min(...limits.map((limit) => limit.value)));
 
   let limitingFactor = "owned_quantity";
   if (maxSafeTrades === 0) {
@@ -187,6 +184,7 @@ function resolveUnitWeight(explicitWeight, tierLevel) {
 
   const tier = BARTER_TIERS[tierLevel];
   const tierWeight = tier?.unitWeight;
+  if (tierLevel === 0) return 0;
   const isValidZeroWeight = tierWeight === 0 && tier.id === "crow_coins";
   return Number.isFinite(tierWeight) && (tierWeight > 0 || isValidZeroWeight) ? tierWeight : null;
 }
@@ -304,32 +302,16 @@ export function simulateRoute(
     const arrivalOverCapacity =
       isCapacityValid && weightAfter !== null && weightAfter > shipMaxWeight;
 
-    const deltaPerTrade =
-      plan.inputUnitWeight !== null && plan.outputUnitWeight !== null
-        ? plan.stop.ratioOutput * plan.outputUnitWeight -
-          plan.stop.ratioInput * plan.inputUnitWeight
-        : null;
-    const beforeLastTrade =
-      weightBefore !== null && deltaPerTrade !== null
-        ? weightBefore + Math.max(0, deltaPerTrade) * Math.max(0, plan.stop.tradeCount - 1)
-        : null;
-    const tooHeavyBeforeLast =
-      isCapacityValid && beforeLastTrade !== null && beforeLastTrade > shipMaxWeight;
     const finalOverloadAllowed =
       index === stopPlans.length - 1 &&
       arrivalOverCapacity &&
       Number.isFinite(finalCargoLimit) &&
       finalCargoLimit > shipMaxWeight &&
       weightAfter <= finalCargoLimit &&
-      !departureOverCapacity &&
-      !tooHeavyBeforeLast;
+      !departureOverCapacity;
     if (finalOverloadAllowed) hasFinalOverload = true;
 
-    if (
-      departureOverCapacity ||
-      tooHeavyBeforeLast ||
-      (arrivalOverCapacity && !finalOverloadAllowed)
-    ) {
+    if (departureOverCapacity || (arrivalOverCapacity && !finalOverloadAllowed)) {
       isOverweight = true;
     }
 
@@ -339,7 +321,6 @@ export function simulateRoute(
       weightAfter,
       isOverCapacityAtDeparture: departureOverCapacity,
       isOverCapacityAtArrival: arrivalOverCapacity,
-      tooHeavyBeforeLast,
       finalOverloadAllowed,
       overCapacityAtDeparture:
         isCapacityValid && weightBefore !== null ? Math.max(0, weightBefore - shipMaxWeight) : 0,
@@ -398,7 +379,7 @@ export function calculateAutomaticTierChain({
   const invalidStartUnits = !Number.isSafeInteger(startUnits) || startUnits < 0;
   const invalidTierRange =
     !Number.isInteger(startTier) ||
-    startTier < 1 ||
+    startTier < 0 ||
     startTier > 6 ||
     !Number.isInteger(targetTier) ||
     targetTier <= startTier ||
@@ -411,8 +392,8 @@ export function calculateAutomaticTierChain({
 
   if (!invalidTierRange) {
     for (let tier = startTier; tier <= targetTier; tier++) {
-      const unitWeight = BARTER_TIERS[tier]?.unitWeight;
-      if (!Number.isFinite(unitWeight) || unitWeight <= 0) {
+      const unitWeight = tier === 0 ? 0 : BARTER_TIERS[tier]?.unitWeight;
+      if (!Number.isFinite(unitWeight) || (unitWeight <= 0 && tier !== 0)) {
         invalidTierWeight = tier;
         break;
       }

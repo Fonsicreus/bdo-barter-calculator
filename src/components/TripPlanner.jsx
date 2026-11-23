@@ -2,6 +2,10 @@ import { ArrowDown, ArrowRight, ArrowUp, Navigation, Trash2 } from "lucide-react
 import { BARTER_TIERS } from "../data/barterTiers";
 import { useLanguage } from "../i18n/LanguageContext";
 import { simulateRoute } from "../utils/calculator";
+import { findFittingQuantity } from "../utils/routeRecommendation";
+import { RouteCargoMeter } from "./RouteCargoMeter";
+import { RouteCargoSummary } from "./RouteCargoSummary";
+import { TradeCountEditor } from "./TradeCountEditor";
 
 function formatWeight(value, t) {
   return value === null || value === undefined ? t("Unknown") : `${value.toLocaleString()} LT`;
@@ -16,6 +20,9 @@ export function TripPlanner({
   onRemoveStop,
   onClearStops,
   onMoveStop,
+  onChangeTradeCount,
+  latestStopId,
+  hideCargoSummary = false,
   shipMaxWeight,
   initialCargoWeight,
   shipCapacityValid,
@@ -29,6 +36,24 @@ export function TripPlanner({
     shipCapacityValid,
     finalCargoLimit,
   );
+  const latestStop = stops.find((stop) => stop.id === latestStopId) ?? stops.at(-1);
+  const recommendation =
+    latestStop &&
+    simulation.isOverweight &&
+    simulation.isCapacityValid &&
+    !simulation.hasMissingWeights
+      ? findFittingQuantity({
+          quantity: latestStop.tradeCount,
+          shipMaxWeight,
+          initialCargoWeight,
+          shipCapacityValid,
+          finalCargoLimit,
+          makeStops: (count) =>
+            stops.map((stop) =>
+              stop.id === latestStop.id ? { ...stop, tradeCount: count } : stop,
+            ),
+        })
+      : null;
 
   if (stops.length === 0)
     return (
@@ -73,20 +98,53 @@ export function TripPlanner({
         </button>
       </div>
 
+      {!hideCargoSummary && (
+        <RouteCargoSummary
+          simulation={simulation}
+          shipMaxWeight={shipMaxWeight}
+          finalCargoLimit={finalCargoLimit}
+        />
+      )}
+
+      {recommendation && (
+        <div
+          role="alert"
+          className="mt-4 space-y-2 rounded-xl border border-rose-300 bg-rose-50 p-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-200"
+        >
+          <p>{t("The saved route exceeds a cargo limit. Try reducing the last added stop.")}</p>
+          {recommendation.quantity != null ? (
+            <button
+              type="button"
+              onClick={() => onChangeTradeCount?.(latestStop.id, recommendation.quantity)}
+              className="rounded-lg bg-rose-700 px-3 py-2 font-bold text-white"
+            >
+              {t("Change the last added stop to {count} exchanges", {
+                count: recommendation.quantity.toLocaleString(),
+              })}
+            </button>
+          ) : (
+            <p>
+              {t(
+                recommendation.limited
+                  ? "No fitting quantity was found within the search limit. Reduce it further or change the route."
+                  : "Reducing this stop alone cannot make the route fit; adjust another stop or ship capacity.",
+              )}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Stops Timeline */}
       <div className="mt-4 space-y-3">
         {simulation.stopsSummary.map((item, index) => {
           const inTier = BARTER_TIERS[item.stop.inputTierLevel];
           const outTier = BARTER_TIERS[item.stop.outputTierLevel];
-          const isOverAtStep =
-            item.isOverCapacityAtDeparture ||
-            item.isOverCapacityAtArrival ||
-            item.tooHeavyBeforeLast;
+          const isOverAtStep = item.isOverCapacityAtDeparture || item.isOverCapacityAtArrival;
 
           return (
             <div
               key={item.stop.id}
-              className={`p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition-colors ${
+              className={`p-3.5 rounded-xl border text-xs transition-colors ${
                 item.finalOverloadAllowed
                   ? "bg-amber-50/50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/60"
                   : isOverAtStep
@@ -96,101 +154,115 @@ export function TripPlanner({
                       : "bg-slate-50/80 border-slate-200 dark:bg-satella-surface/60 dark:border-satella-border/80"
               }`}
             >
-              <div className="flex items-center space-x-3">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold text-xs bg-purple-100 text-purple-700 dark:bg-satella-surface dark:text-satella-primary border border-purple-300 dark:border-satella-border">
-                  {index + 1}
-                </div>
-                <div>
-                  <div className="font-semibold text-slate-900 dark:text-satella-silver flex items-center gap-1.5">
-                    <span>
-                      {t("Give")} {item.inputGiven} {t(inTier.shortName)}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="text-purple-600 dark:text-satella-glow font-bold">
-                      {t("Get")} {item.outputReceived} {t(outTier.shortName)}
-                    </span>
+              <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold text-xs bg-purple-100 text-purple-700 dark:bg-satella-surface dark:text-satella-primary border border-purple-300 dark:border-satella-border">
+                    {index + 1}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">
-                    {item.stop.tradeCount} {t("exchanges @")} {item.stop.ratioInput}:
-                    {item.stop.ratioOutput} {t("ratio")}
-                  </div>
-                  <div className="text-xs text-slate-400 dark:text-slate-500">
-                    {item.inputLoadedUnits > 0
-                      ? t("{count} input units loaded at first port", {
-                          count: item.inputLoadedUnits,
-                        })
-                      : t("All inputs reused from earlier stops")}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between sm:justify-end gap-4">
-                <div className="text-right">
-                  <div className="text-xs text-slate-400 dark:text-slate-500 uppercase">
-                    {t("Departure → Arrival")}
-                  </div>
-                  <div
-                    className={`font-mono font-bold ${
-                      isOverAtStep
-                        ? "text-rose-600 dark:text-rose-400"
-                        : item.hasMissingWeight
-                          ? "text-amber-700 dark:text-amber-300"
-                          : "text-slate-800 dark:text-satella-silver-glow"
-                    }`}
-                  >
-                    {formatWeight(item.weightBefore, t)} → {formatWeight(item.weightAfter, t)}
-                  </div>
-                  <div className="text-xs text-slate-400 dark:text-slate-500">
-                    {t("Limit:")} {capacityLabel}
-                  </div>
-                  {isOverAtStep && (
-                    <div className="text-xs font-semibold text-rose-600 dark:text-rose-400">
-                      {item.overCapacityAtDeparture > 0
-                        ? t("{weight} LT over at departure", {
-                            weight: item.overCapacityAtDeparture.toLocaleString(),
-                          })
-                        : ""}
-                      {item.overCapacityAtDeparture > 0 && item.overCapacityAtArrival > 0
-                        ? " · "
-                        : ""}
-                      {item.overCapacityAtArrival > 0
-                        ? t("{weight} LT over after exchange", {
-                            weight: item.overCapacityAtArrival.toLocaleString(),
-                          })
-                        : ""}
+                  <div>
+                    <div className="font-semibold text-slate-900 dark:text-satella-silver flex items-center gap-1.5">
+                      <span>
+                        {t("Give")} {item.inputGiven} {t(inTier.shortName)}
+                      </span>
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-purple-600 dark:text-satella-glow font-bold">
+                        {t("Get")} {item.outputReceived} {t(outTier.shortName)}
+                      </span>
                     </div>
-                  )}
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      {item.stop.tradeCount} {t("exchanges @")} {item.stop.ratioInput}:
+                      {item.stop.ratioOutput} {t("ratio")}
+                    </div>
+                    {onChangeTradeCount && (
+                      <TradeCountEditor
+                        key={item.stop.tradeCount}
+                        count={item.stop.tradeCount}
+                        onChange={(count) => onChangeTradeCount(item.stop.id, count)}
+                      />
+                    )}
+                    <div className="text-xs text-slate-400 dark:text-slate-500">
+                      {item.inputLoadedUnits > 0
+                        ? t("{count} input units loaded at first port", {
+                            count: item.inputLoadedUnits,
+                          })
+                        : t("All inputs reused from earlier stops")}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    disabled={index === 0}
-                    onClick={() => onMoveStop(index, -1)}
-                    aria-label={t("Move stop up")}
-                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/50 hover:text-purple-600 disabled:opacity-30 dark:hover:bg-satella-hover"
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={index === stops.length - 1}
-                    onClick={() => onMoveStop(index, 1)}
-                    aria-label={t("Move stop down")}
-                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/50 hover:text-purple-600 disabled:opacity-30 dark:hover:bg-satella-hover"
-                  >
-                    <ArrowDown className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onRemoveStop(item.stop.id)}
-                    aria-label={t("Remove stop")}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200/50 dark:hover:bg-satella-hover transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div className="flex items-center justify-between sm:justify-end gap-4">
+                  <div className="text-right">
+                    <div className="text-xs text-slate-400 dark:text-slate-500 uppercase">
+                      {t("Departure → Arrival")}
+                    </div>
+                    <div
+                      className={`font-mono font-bold ${
+                        isOverAtStep
+                          ? "text-rose-600 dark:text-rose-400"
+                          : item.hasMissingWeight
+                            ? "text-amber-700 dark:text-amber-300"
+                            : "text-slate-800 dark:text-satella-silver-glow"
+                      }`}
+                    >
+                      {formatWeight(item.weightBefore, t)} → {formatWeight(item.weightAfter, t)}
+                    </div>
+                    <div className="text-xs text-slate-400 dark:text-slate-500">
+                      {t("Limit:")} {capacityLabel}
+                    </div>
+                    {isOverAtStep && (
+                      <div className="text-xs font-semibold text-rose-600 dark:text-rose-400">
+                        {item.overCapacityAtDeparture > 0
+                          ? t("{weight} LT over at departure", {
+                              weight: item.overCapacityAtDeparture.toLocaleString(),
+                            })
+                          : ""}
+                        {item.overCapacityAtDeparture > 0 && item.overCapacityAtArrival > 0
+                          ? " · "
+                          : ""}
+                        {item.overCapacityAtArrival > 0
+                          ? t("{weight} LT over after exchange", {
+                              weight: item.overCapacityAtArrival.toLocaleString(),
+                            })
+                          : ""}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      disabled={index === 0}
+                      onClick={() => onMoveStop(index, -1)}
+                      aria-label={t("Move stop up")}
+                      className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/50 hover:text-purple-600 disabled:opacity-30 dark:hover:bg-satella-hover"
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={index === stops.length - 1}
+                      onClick={() => onMoveStop(index, 1)}
+                      aria-label={t("Move stop down")}
+                      className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/50 hover:text-purple-600 disabled:opacity-30 dark:hover:bg-satella-hover"
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onRemoveStop(item.stop.id)}
+                      aria-label={t("Remove stop")}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200/50 dark:hover:bg-satella-hover transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
+              <RouteCargoMeter
+                weight={item.weightAfter}
+                capacity={shipMaxWeight}
+                validCapacity={simulation.isCapacityValid}
+              />
             </div>
           );
         })}

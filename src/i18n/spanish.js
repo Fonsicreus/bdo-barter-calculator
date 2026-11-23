@@ -1,4 +1,84 @@
 export const spanish = {
+  Language: "Idioma",
+  Debug: "Debug",
+  "Base:": "Base:",
+  Overload: "Sobrecarga",
+  "Only the last offer may end overloaded; the 150% limit is not confirmed.":
+    "Solo la última oferta puede terminar con sobrecarga; el límite del 150 % no está confirmado.",
+  "The 150% limit is a temporary planning assumption, not a confirmed game limit. Cargo must fit at departure and before each offer; a single offer can be exchanged in a batch. Breezy Sail is unavailable while overloaded.":
+    "El límite del 150 % es una suposición provisional, no un límite confirmado del juego. La carga debe caber al salir y antes de cada oferta; una oferta puede intercambiarse en un solo lote. Viento a favor (Breezy Sail) no está disponible con sobrecarga.",
+  "The multi-stop route planner only allows overload after the last offer, within this provisional limit.":
+    "El planificador solo permite sobrecarga después de la última oferta y dentro de este límite provisional.",
+  "This proposed exchange makes the route exceed an allowed cargo limit.":
+    "Este intercambio haría que la ruta supere un límite de carga.",
+  "Use {count} starting exchanges or units instead": "Usar {count} trueques o unidades iniciales",
+  "No fitting quantity was found within the search limit. Reduce it further or change the route.":
+    "No se encontró una cantidad que quepa dentro del límite de búsqueda. Redúcela más o cambia la ruta.",
+  "Reducing this addition alone cannot make the route fit; adjust the existing route or ship capacity.":
+    "Reducir solo esta incorporación no basta para que quepa: ajusta la ruta existente o la capacidad del barco.",
+  "Cargo overview: saved route only": "Resumen de carga: solo la ruta añadida",
+  "Cargo overview includes this unsaved exchange":
+    "El resumen de carga incluye este intercambio todavía no añadido",
+  "The saved route exceeds a cargo limit. Try reducing the last added stop.":
+    "La ruta añadida supera un límite de carga. Prueba a reducir la última parada añadida.",
+  "Change the last added stop to {count} exchanges":
+    "Cambiar la última parada añadida a {count} trueques",
+  "Reducing this stop alone cannot make the route fit; adjust another stop or ship capacity.":
+    "Reducir solo esta parada no basta para que quepa: ajusta otra parada o la capacidad del barco.",
+  "Exchange count": "Número de trueques",
+  "Reduce exchange count": "Reducir número de trueques",
+  "Increase exchange count": "Aumentar número de trueques",
+  "Debug mode: allow custom ratios": "Modo depuración: permitir ratios personalizados",
+  "For Tier 0 exchanges, include the land materials in pre-loaded cargo. Their weight stays counted throughout the calculation, even after exchange; results are conservative only if all materials are included.":
+    "Para trueques de nivel 0, incluye los materiales terrestres en la carga inicial. Su peso se mantiene durante todo el cálculo, incluso después del trueque; el resultado solo es conservador si incluyes todos los materiales.",
+  "Number of Tier 0 exchanges": "Cantidad de trueques de nivel 0",
+  "Included in pre-loaded cargo": "Incluido en la carga inicial",
+  "No preset is available for this offer. Enable debug mode to enter its ratio.":
+    "No hay un ratio predefinido para esta oferta. Activa el modo depuración para introducirlo.",
+  "Voyage cargo overview": "Resumen de carga de la ruta",
+  "Peak cargo during route": "Carga máxima de la ruta",
+  "Additional cargo for the whole route": "Carga adicional para toda la ruta",
+  "Cargo after this stop": "Carga después de esta parada",
+  "Cargo space cannot be calculated until the weight and ship capacity are known.":
+    "No se puede calcular el espacio libre hasta conocer el peso y la capacidad del barco.",
+  "{weight} LT above normal capacity": "{weight} LT por encima de la capacidad normal",
+  "{weight} LT free at this weight": "{weight} LT libres con esta carga",
+  "Additional cargo is the most you can add at departure and keep aboard throughout this planned route. It is not another calculated exchange; item slots and offer requirements still apply.":
+    "La carga adicional es lo máximo que puedes añadir al salir y mantener a bordo durante toda la ruta prevista. No incluye otro trueque: también debes comprobar los huecos y los requisitos de cada oferta.",
+  "This route already exceeds an allowed limit; reduce the load or change the route before adding more cargo.":
+    "Esta ruta ya supera un límite permitido; reduce la carga o cambia la ruta antes de añadir más objetos.",
+  "Special Barter requirements": "Requisitos de trueque especial",
+  "The April 16, 2026 update changed Special Barter requirements to gold bars or Level 4 goods. Confirm the required items and the reward in game.":
+    "La actualización del 16 de abril de 2026 cambió los requisitos del trueque especial a lingotes de oro u objetos de nivel 4. Confirma los objetos exigidos y la recompensa en el juego.",
+  "Source: Pearl Abyss patch notes": "Fuente: notas del parche de Pearl Abyss",
+  "Only starting units used by the first exchange are loaded. Unused intermediate goods remain aboard; check the route weight and offer limits below.":
+    "Solo se cargan las unidades iniciales utilizadas en el primer intercambio. Los objetos intermedios sobrantes permanecen a bordo; revisa el peso de la ruta y los límites de las ofertas.",
+  "Optional offer limit": "Límite de la oferta (opcional)",
+  "The Level {level} offer has no remaining exchanges.":
+    "La oferta de nivel {level} no tiene intercambios restantes.",
+  "Select the starting and final levels. The calculator adds each exchange in between; repeat to add independent trades.":
+    "Elige los niveles inicial y final. La calculadora añade los intercambios intermedios; repite el proceso para añadir trueques independientes.",
+  "Minimum level": "Nivel mínimo",
+  "Starting units for this route": "Unidades iniciales para esta cadena",
+  "Choose the ratio for each offer": "Elige la proporción de cada oferta",
+  "Ratios are suggestions. Select the amounts shown in each in-game offer.":
+    "Las proporciones son sugerencias. Selecciona las cantidades que muestra cada oferta del juego.",
+  "Not enough Level {level} goods for this ratio: {available} available, {required} required.":
+    "No hay suficientes objetos de nivel {level} para esta proporción: hay {available} y se necesitan {required}.",
+  "Enter positive whole numbers for the starting quantity and each ratio.":
+    "Introduce números enteros positivos para la cantidad inicial y cada proporción.",
+  "Automatic exchange preview": "Vista previa automática de intercambios",
+  "Add exchanges to route": "Añadir intercambios a la ruta",
+  "Barter route unlocks": "Desbloqueo de rutas de trueque",
+  "Total completed exchanges, according to the community guide. Routes are separate from item levels; availability can depend on refreshes.":
+    "Número total de intercambios completados según la guía de la comunidad. Las rutas son distintas de los niveles de objetos y su disponibilidad puede depender de las renovaciones.",
+  "Route {number}": "Ruta {number}",
+  "Special Barter may start appearing at around 140 completed exchanges; offers appear randomly. The game shows the available items and quantities.":
+    "Los trueques especiales pueden empezar a aparecer alrededor de los 140 intercambios completados; las ofertas aparecen de forma aleatoria. El juego muestra los objetos y cantidades disponibles.",
+  "Brilliant Rock Salt Ingots and Brilliant Pearl Shards: the guide lists 1,000 barters for ship material refreshes and 1,500 for trade item refreshes.":
+    "Lingotes de sal de roca brillante (Brilliant Rock Salt Ingots) y fragmentos de perla brillante (Brilliant Pearl Shards): la guía indica 1.000 trueques para renovaciones de materiales de barco y 1.500 para renovaciones de objetos de trueque.",
+  "Source: Black Desert Foundry bartering guide":
+    "Fuente: guía de trueques de Black Desert Foundry",
   "The multi-stop route planner only allows overload after the last exchange, within this provisional limit.":
     "El planificador de varios trueques solo permite sobrecarga tras el último intercambio y dentro de este límite provisional.",
   "The final exchange exceeds normal capacity but remains within the provisional overload limit.":

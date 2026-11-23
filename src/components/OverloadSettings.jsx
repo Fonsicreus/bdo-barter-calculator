@@ -1,39 +1,31 @@
+import { Weight } from "lucide-react";
 import { useLanguage } from "../i18n/LanguageContext";
 
-export function OverloadSettings({ enabled, onEnabledChange, finalCargoLimit }) {
+export function OverloadSettings({ enabled = false, onEnabledChange, finalCargoLimit }) {
   const { t } = useLanguage();
-
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 text-sm dark:border-amber-900/60 dark:bg-amber-950/20">
-      <label className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
-        <input
-          type="checkbox"
-          checked={enabled}
-          onChange={(event) => onEnabledChange(event.target.checked)}
-          className="h-4 w-4 accent-purple-600"
-        />
-        {t("Simulate final overload")}
-      </label>
+    <div className="space-y-1">
+      <button
+        type="button"
+        aria-pressed={enabled}
+        onClick={() => onEnabledChange?.(!enabled)}
+        className={
+          enabled
+            ? "inline-flex items-center gap-1.5 rounded-lg border border-amber-500 bg-amber-100 px-2.5 py-1.5 text-xs font-semibold text-amber-900 dark:border-amber-600 dark:bg-amber-950/50 dark:text-amber-200"
+            : "inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-satella-border dark:bg-satella-surface dark:text-satella-silver"
+        }
+      >
+        <Weight className="h-4 w-4" aria-hidden="true" /> {t("Overload")}
+      </button>
       {enabled && (
-        <div className="mt-3 space-y-2">
-          {finalCargoLimit !== null && (
-            <p className="text-xs font-semibold text-amber-900 dark:text-amber-200">
-              {t("Provisional maximum: 150% of normal capacity ({weight} LT).", {
+        <p className="text-xs text-amber-800 dark:text-amber-300">
+          {finalCargoLimit != null
+            ? t("Provisional maximum: 150% of normal capacity ({weight} LT).", {
                 weight: finalCargoLimit.toLocaleString(),
-              })}
-            </p>
-          )}
-          <p className="text-xs text-slate-600 dark:text-slate-300">
-            {t(
-              "The 150% limit is a temporary planning assumption, not a confirmed game limit. Each exchange must start within normal capacity. Breezy Sail is unavailable while overloaded.",
-            )}
-          </p>
-          <p className="text-xs text-slate-600 dark:text-slate-300">
-            {t(
-              "The multi-stop route planner only allows overload after the last exchange, within this provisional limit.",
-            )}
-          </p>
-        </div>
+              })
+            : t("configure ship capacity")}{" "}
+          {t("Only the last offer may end overloaded; the 150% limit is not confirmed.")}
+        </p>
       )}
     </div>
   );

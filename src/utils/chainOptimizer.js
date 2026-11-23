@@ -44,10 +44,6 @@ function buildPlan({
     const outputUnits = tradeCount * ratio.output;
     if (!Number.isSafeInteger(outputUnits) || inventory[tier] < inputUnits) return null;
     const weightBefore = weight;
-    const delta = ratio.output * weights[tier + 1] - ratio.input * weights[tier];
-    const beforeLast = weightBefore + Math.max(0, delta) * (tradeCount - 1);
-    if (!Number.isFinite(beforeLast) || beforeLast > capacity) return null;
-    extraCargoAllowance = Math.min(extraCargoAllowance, capacity - beforeLast);
     inventory[tier] -= inputUnits;
     inventory[tier + 1] += outputUnits;
     weight = cargo;
@@ -93,7 +89,10 @@ function buildPlan({
 // Weight-reducing custom ratios require exhaustive search instead.
 function findBestPlan(options) {
   const { startTier, endTier, stock, ratios, weights, cargo, capacity, finalCapacity } = options;
-  let possible = Math.min(stock, Math.floor(Math.max(0, capacity - cargo) / weights[startTier]));
+  let possible =
+    weights[startTier] === 0
+      ? stock
+      : Math.min(stock, Math.floor(Math.max(0, capacity - cargo) / weights[startTier]));
   let monotone = true;
   for (let tier = startTier; tier < endTier; tier++) {
     const ratio = ratios[tier];

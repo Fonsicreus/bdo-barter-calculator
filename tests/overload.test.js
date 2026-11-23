@@ -29,41 +29,41 @@ describe("final overload simulation", () => {
     expect(calculateTrade({ ...bigTrade, finalCargoLimit: limit }).maxSafeTrades).toBe(0);
     expect(
       calculateTrade({ ...bigTrade, finalCargoLimit: Number.POSITIVE_INFINITY }).maxSafeTrades,
-    ).toBe(1);
+    ).toBe(10);
     const bigChain = { ...chain, shipMaxWeight: 11500, ratios: { 2: { input: 1, output: 20 } } };
     expect(calculateAutomaticTierChain({ ...bigChain, finalCargoLimit: limit }).plan).toBeNull();
     expect(
       calculateAutomaticTierChain({ ...bigChain, finalCargoLimit: Number.POSITIVE_INFINITY }).plan
         .finalCargoWeight,
-    ).toBe(18000);
+    ).toBe(180000);
   });
   test("uses normal capacity when disabled", () => {
     expect(calculateTrade(trade).maxSafeTrades).toBe(5);
     expect(calculateAutomaticTierChain(chain).plan.sourceUnits).toBe(5);
   });
 
-  test("only the last exchange may cross normal capacity", () => {
+  test("the entire final offer can cross normal capacity as a batch", () => {
     const result = calculateTrade({ ...trade, finalCargoLimit: 15000 });
-    expect(result.maxSafeTrades).toBe(6);
-    expect(result.weightAtArrival).toBe(10800);
+    expect(result.maxSafeTrades).toBe(8);
+    expect(result.weightAtArrival).toBe(14400);
     expect(result.isOverCapacityAtArrival).toBe(true);
     const plan = calculateAutomaticTierChain({ ...chain, finalCargoLimit: 15000 }).plan;
-    expect(plan.sourceUnits).toBe(6);
-    expect(plan.finalCargoWeight).toBe(10800);
+    expect(plan.sourceUnits).toBe(8);
+    expect(plan.finalCargoWeight).toBe(14400);
     expect(plan.remainingCapacityAtPeak).toBe(600);
   });
 
   test("automatically estimates the maximum final load without a user-entered cap", () => {
     const result = calculateTrade({ ...trade, finalCargoLimit: Number.POSITIVE_INFINITY });
-    expect(result.maxSafeTrades).toBe(6);
-    expect(result.weightAtArrival).toBe(10800);
+    expect(result.maxSafeTrades).toBe(10);
+    expect(result.weightAtArrival).toBe(18000);
     const plan = calculateAutomaticTierChain({
       ...chain,
       finalCargoLimit: Number.POSITIVE_INFINITY,
     }).plan;
-    expect(plan.sourceUnits).toBe(6);
-    expect(plan.finalCargoWeight).toBe(10800);
-    expect(plan.remainingCapacityAtPeak).toBe(600);
+    expect(plan.sourceUnits).toBe(10);
+    expect(plan.finalCargoWeight).toBe(18000);
+    expect(plan.remainingCapacityAtPeak).toBe(6000);
   });
 
   test("respects the chosen final limit and never starts overloaded", () => {
@@ -86,9 +86,26 @@ describe("final overload simulation", () => {
     });
     expect(result.plan.furthestTier).toBe(4);
     expect(result.plan.steps[0].weightAfter).toBeLessThanOrEqual(10000);
-    expect(
-      result.plan.steps[1].weightBefore + (result.plan.steps[1].tradeCount - 1) * 1100,
-    ).toBeLessThanOrEqual(10000);
+    expect(result.plan.steps[1].weightBefore).toBeLessThanOrEqual(10000);
     expect(result.plan.finalCargoWeight).toBeLessThanOrEqual(15000);
+  });
+
+  test("allows the seven-item island batch but not an overloaded departure", () => {
+    const options = {
+      shipMaxWeight: 11500,
+      currentShipWeight: 400,
+      inputTier: BARTER_TIERS[3],
+      outputTier: BARTER_TIERS[4],
+      ownedQuantity: 7,
+      ratioInput: 1,
+      ratioOutput: 2,
+      finalCargoLimit: 17250,
+    };
+    const result = calculateTrade(options);
+    expect(result.maxSafeTrades).toBe(7);
+    expect(result.weightAtDeparture).toBe(6700);
+    expect(result.weightAtArrival).toBe(14400);
+    expect(calculateTrade({ ...options, currentShipWeight: 6000 }).maxSafeTrades).toBe(5);
+    expect(calculateTrade({ ...options, currentShipWeight: 11501 }).maxSafeTrades).toBe(0);
   });
 });

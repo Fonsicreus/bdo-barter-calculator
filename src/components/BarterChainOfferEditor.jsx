@@ -2,7 +2,13 @@ import { Settings2 } from "lucide-react";
 import { BARTER_TIERS } from "../data/barterTiers";
 import { useLanguage } from "../i18n/LanguageContext";
 
-export function BarterChainOfferEditor({ steps, ratioInputs, onSelectRatio, onUpdateStepValue }) {
+export function BarterChainOfferEditor({
+  steps,
+  ratioInputs,
+  onSelectRatio,
+  onUpdateStepValue,
+  debugEnabled = false,
+}) {
   const { t } = useLanguage();
   return (
     <details className="group rounded-xl border border-slate-200 bg-slate-50/70 dark:border-satella-border dark:bg-satella-surface/40">
@@ -26,7 +32,9 @@ export function BarterChainOfferEditor({ steps, ratioInputs, onSelectRatio, onUp
           const presets = BARTER_TIERS[tier].typicalRatios;
           const defaultPreset = presets[0];
           const selectedRatio =
-            values.mode === "custom" ? "custom" : String(values.presetIndex ?? 0);
+            debugEnabled && tier !== 0 && values.mode === "custom"
+              ? "custom"
+              : String(values.presetIndex ?? 0);
 
           return (
             <div
@@ -55,7 +63,9 @@ export function BarterChainOfferEditor({ steps, ratioInputs, onSelectRatio, onUp
                       {ratio.input} : {ratio.output} {t("typical")}
                     </option>
                   ))}
-                  <option value="custom">{t("Custom ratio")}</option>
+                  {debugEnabled && tier !== 0 && (
+                    <option value="custom">{t("Custom ratio")}</option>
+                  )}
                 </select>
               </div>
 

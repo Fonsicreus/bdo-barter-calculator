@@ -1,106 +1,74 @@
-# BDO Barter & Ship Weight Calculator ⚓
+# BDO Barter Calculator
 
-A high-performance web application designed for Black Desert Online (BDO) captains and barterers to calculate and optimize trade cargo weights without exceeding their vessel's maximum LT capacity.
+**English** · [Español](README.es.md)
 
-## Version 1.1
+Work out what to load at port, how heavy your cargo will be after each island, and how many goods you can bring home. Satella maintains this unofficial Black Desert Online planner.
 
-- Three menus separate single trades, automatic tier chains, and custom routes with multiple exchanges. A route can mix linked and independent trades; the user must confirm the items are the same before reusing an earlier output, since levels alone do not identify items.
-- Added an automatic multi-tier chain planner: enter the starting level, maximum level and quantity to see each exchange and the cargo weight at every stage.
-- Typical offer ratios are applied by default; custom ratios and each offer's remaining exchange limit can be entered when the in-game offer differs.
-- Increased small text sizes and removed cookie-storage notices from the interface.
+Use the language selector to switch between English, Spanish, Korean, Japanese, and Simplified Chinese.
 
-Features a dark theme inspired by **Satella (The Witch of Envy from Re:Zero)** with deep obsidian void backgrounds, glowing amethyst/violet highlights, and ethereal silver accents.
+## What you can plan
 
----
+| In the planner | What you can do |
+| --- | --- |
+| **Single trade** | Find how many exchanges fit and check the cargo weight after one island offer. |
+| **Tier chain** | Choose a target level and find the starting quantity that maximizes your haul within the remaining exchanges at each step. |
+| **Multiple trades** | Combine linked and independent offers. Change quantities or move a stop to see where cargo weight peaks. |
+| **Goods reference** | Look up item weights, NPC sale prices, route unlock counts, and Special Barter requirements. |
 
-## 🛠️ Tech Stack
+For a first calculation, select your ship, enter its maximum LT from **Ship Info**, and choose **Single trade**. For example, if an island offers two Level 2 goods for one Level 1 good, four exchanges turn 400 LT of goods into 3,200 LT. Any other cargo already on board adds to both totals.
 
-- **Runtime & Package Manager:** [Bun](https://bun.sh)
-- **Frontend Framework:** [React 18](https://react.dev) (Pure JavaScript & JSX)
-- **Build Tool:** [Vite](https://vitejs.dev/)
-- **Linter & Formatter:** [Biome](https://biomejs.dev/)
-- **Diagnostics & Code Health:** [React Doctor](https://react.doctor/)
-- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) with `@tailwindcss/vite` (**Zero PostCSS**)
-- **Icons:** [Lucide React](https://lucide.dev/)
-- **State Persistence:** Native Cookies API (persists ship choice, max LT capacity, and theme for 365 days)
+## Barter data
 
----
+The base weights and NPC sale prices below follow the April 16, 2026 Pearl Abyss update.
 
-## ✨ Key Architectural Highlights
-
-* **Zero TypeScript:** 100% clean, standard modern JavaScript (ESM + JSX).
-* **Zero PostCSS:** Powered by the new **Tailwind CSS v4 engine** via `@tailwindcss/vite`. No `postcss.config.js`, no `autoprefixer`, and no `tailwind.config.js` required.
-* **React Doctor Integrated:** Run deterministic static analysis to catch React anti-patterns, performance bottlenecks, and accessibility issues.
-
----
-
-## 🚀 Available Scripts
-
-```bash
-# Start local development server
-bun run dev
-
-# Run React Doctor health scan
-bun run doctor
-
-# Check code with Biome
-bun run lint
-
-# Auto-format codebase with Biome
-bun run format
-
-# Production build
-bun run build
-
-# Preview production build
-bun run preview
-```
-
----
-
-## 📊 Barter Data and Variable Inputs
-
-### Fixed base data
-
-Unit weights and NPC sale prices follow the official Pearl Abyss barter update from **April 16, 2026**, audited again on **November 15, 2026**:
-
-| Tier | Unit weight | NPC sale price |
+| Level | Weight per item | NPC sale price |
 | --- | --- | --- |
-| Level 1 | 100 LT | Not sellable |
-| Level 2 | 400 LT | Not sellable |
-| Level 3 | 900 LT | 1,000,000 Silver |
-| Level 4 | 1,000 LT | 2,000,000 Silver |
-| Level 5 | 1,000 LT | 10,000,000 normal / 25,000,000 Great Ocean |
-| Level 6 | 2,000 LT | 50,000,000 Silver |
-| Level 7 | 2,000 LT | 100,000,000 Silver |
+| 1 | 100 LT | Not sellable |
+| 2 | 400 LT | Not sellable |
+| 3 | 900 LT | 1,000,000 Silver |
+| 4 | 1,000 LT | 2,000,000 Silver |
+| 5 | 1,000 LT | 10,000,000 Silver normal / 25,000,000 Silver Great Ocean |
+| 6 | 2,000 LT | 50,000,000 Silver |
+| 7 | 2,000 LT | 100,000,000 Silver |
 
-Sources: Pearl Abyss [April 16, 2026 barter update](https://www.naeu.playblackdesert.com/News/Detail?groupContentNo=9973) and [barter update history](https://www.naeu.playblackdesert.com/Adventure/History?_groupMasterNo=10127). Hull base weights were cross-checked with BDO Codex and Black Desert Foundry.
+- Use the quantities and remaining exchange count shown on the individual in-game offer. The header's **Debug** button enables custom ratios for supported offers.
+- Level 0 → 1 uses one Level 1 good per completed exchange. Enter the number of exchanges and include the land materials in **Pre-loaded Cargo**. Their weight remains in the estimate throughout the route.
+- Ship materials have item-specific weights. Crow Coin payouts vary by offer. For Level 5 sales, check whether the item is tagged **Great Ocean**.
+- The planner matches goods by tier when it reuses earlier outputs. Confirm that the items are the exact ones requested by the next offer.
 
-### Data that must come from the current offer
+### Ship capacity
 
-- **Exchange ratio:** preset buttons are suggestions only. Level 1 to Level 2 and Level 2 to Level 3 offers currently return 2 or 3 outputs per input; other next-tier ratios shown are typical values. The in-game offer is authoritative.
-- **Remaining exchange cap:** the cap belongs to the individual barter offer, not to the island node.
-- **Land goods, ship materials, and Crow Coins:** weights, quantities, and payouts are item- or offer-specific.
-- **Level 5 price:** confirm whether the item is a normal or Great Ocean variant before selling.
-- **Great Ocean goods:** `[Great Ocean]` marks specific rare Level 5 barter goods worth 25M Silver; it is not a price applied to every Level 5 item. Sail from a wharf aboard an ocean-going ship to the barter island shown by the relevant offer, and verify the tagged item in-game before traveling.
+Enter the current maximum LT shown in **Ship Info**, including gear, sailors, and buffs. Keep goods you are about to exchange out of **Pre-loaded Cargo**, except for Level 0 land materials as described above. The route planner assumes any inputs unavailable from earlier stops are loaded at the first port.
 
-### Ship capacity and cargo semantics
+**Overload** lets the final island offer finish above normal capacity when the entire offer is exchanged in one batch. The boat must still fit within normal capacity when loading at port and before starting another offer. The final cap of **150%** is a provisional planning assumption.
 
-- **Actual Max Cargo** is the live total shown in the in-game Ship Info window. It already includes equipped gear, sailors, and buffs. The app never derives it by adding a universal gear preset to the hull base.
-- The **hull base** is displayed for reference only and must not be added again.
-- **Pre-loaded Cargo** is existing cargo, sailor food, or supplies. It must exclude the goods being exchanged. The calculator counts input goods on top of pre-loaded cargo for departure and replaces them with received goods at arrival.
-- Multi-stop route simulation loads inputs that are not produced by an earlier stop at the first port, because barter islands do not provide storage.
-- The multi-tier chain planner treats the starting quantity as available stock and recommends the smallest load that maximizes the output at the selected level. It checks intermediate leftovers, offer limits and cargo throughout the chain. It also shows extra cargo that could be carried unchanged using the space free at peak load; alternatives must not be combined without recalculating their total weight. Ratios are presets and should be adjusted to match the offers.
-- The language selector switches the interface between English and Spanish and remembers the selection on this device.
-- Optional final-overload simulation caps the final cargo at 150% of normal capacity, a provisional planning assumption rather than a verified game limit. Each exchange must start within normal capacity. The multi-stop route planner applies the same final exchange restriction. [Black Desert Foundry's bartering guide](https://www.blackdesertfoundry.com/bartering-guide/) says a ship cannot barter while overweight and Breezy Sail does not work when overweight.
+### Sources
 
-### Validation
+- Pearl Abyss patch notes and update history. [April 16, 2026 update](https://www.naeu.playblackdesert.com/News/Detail?groupContentNo=9973) · [Barter update history](https://www.naeu.playblackdesert.com/Adventure/History?_groupMasterNo=10127)
+- Hull capacities and route unlocks. [BDO Codex](https://bdocodex.com/us/) · [Black Desert Foundry](https://www.blackdesertfoundry.com/bartering-guide/)
+- Changes to Special Barter requirements. [Pearl Abyss patch notes](https://www.tw.playblackdesert.com/zh-TW/News/Detail?countryType=zh-TW&groupContentNo=19419)
+
+## Run locally
+
+Install [Bun](https://bun.sh) and run these commands from the project directory. Open the local address Vite prints in the terminal.
 
 ```bash
-bun run format
-bun run lint
-bun run build
-bun run doctor
+bun install --frozen-lockfile
+bun run dev
 ```
 
-There is no automated `test` script in `package.json`. Manual checks should cover a valid custom capacity, an invalid capacity below the hull base, a variable-weight item without an entered weight, an offer cap, a multi-stop route with an overloaded leg, and an automatic chain from a fixed starting quantity with limited cargo and leftover goods.
+The app uses React, Vite, Tailwind CSS, and Lucide. Run these checks before submitting a change.
+
+```bash
+bun run lint
+bun test
+bun run build
+```
+
+Use `bun run preview` to serve the production build locally. A push to `main` triggers the Pages workflow. Each successful deployment publishes `dist/` at the address GitHub assigned to the calculator. [Deployment workflow](.github/workflows/pages.yml) · [GitHub Pages address](https://fonsicreus.github.io/bdo-barter-calculator/)
+
+## Contributing and license
+
+The project uses AI assistance under human supervision. Contributors review generated changes and check barter data against patch notes and observations in the game. When reporting a data correction, include the game region, patch date, and evidence for the value. [Contribution guide](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md)
+
+The project code uses PolyForm Noncommercial 1.0.0. Commercial use requires separate permission. Black Desert Online is a Pearl Abyss game. [License](LICENSE.md)

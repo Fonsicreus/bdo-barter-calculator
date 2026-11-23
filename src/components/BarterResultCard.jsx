@@ -215,11 +215,6 @@ export function BarterResultCard({
                       {t("LT each) to prevent exceeding your ship's max LT.")}
                     </span>
                   )}
-                  {result.limitingFactor === "before_last_weight" && (
-                    <span>
-                      {t("The ship must be within normal capacity before each exchange.")}
-                    </span>
-                  )}
                   {result.limitingFactor === "departure_weight" && (
                     <span>
                       {t(

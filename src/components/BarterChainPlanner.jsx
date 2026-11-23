@@ -6,7 +6,7 @@ import { calculateAutomaticTierChain } from "../utils/calculator";
 import { BarterChainOfferEditor } from "./BarterChainOfferEditor";
 import { BarterChainResult } from "./BarterChainResult";
 
-const START_LEVELS = [1, 2, 3, 4, 5, 6];
+const START_LEVELS = [0, 1, 2, 3, 4, 5, 6];
 
 function parseNumber(rawValue) {
   if (rawValue.trim() === "") return null;
@@ -15,6 +15,7 @@ function parseNumber(rawValue) {
 }
 
 export function BarterChainPlanner({
+  debugEnabled = false,
   shipMaxWeight,
   currentShipWeight,
   shipCapacityValid,
@@ -38,7 +39,7 @@ export function BarterChainPlanner({
           const values = ratioInputs[tier] ?? {};
           const defaultRatio = BARTER_TIERS[tier].typicalRatios[0];
           const selectedRatio =
-            values.mode === "custom"
+            debugEnabled && tier !== 0 && values.mode === "custom"
               ? { input: parseNumber(values.input ?? ""), output: parseNumber(values.output ?? "") }
               : (BARTER_TIERS[tier].typicalRatios[values.presetIndex ?? 0] ?? defaultRatio);
 
@@ -52,7 +53,7 @@ export function BarterChainPlanner({
           ];
         }),
       ),
-    [ratioInputs, steps],
+    [debugEnabled, ratioInputs, steps],
   );
 
   const result = useMemo(
@@ -150,8 +151,8 @@ export function BarterChainPlanner({
           >
             {START_LEVELS.map((tier) => (
               <option key={tier} value={tier}>
-                {t("Level")} {tier} ({BARTER_TIERS[tier].unitWeight.toLocaleString()}{" "}
-                {t("LT each)")}
+                {t("Level")} {tier}{" "}
+                {tier !== 0 && <>({BARTER_TIERS[tier].unitWeight.toLocaleString()} LT)</>}
               </option>
             ))}
           </select>
@@ -186,7 +187,7 @@ export function BarterChainPlanner({
             htmlFor="chain-start-units"
             className="block text-xs font-semibold text-slate-700 dark:text-satella-silver"
           >
-            {t("Starting goods available")}
+            {t(startTier === 0 ? "Number of Tier 0 exchanges" : "Starting goods available")}
           </label>
           <div className="relative">
             <input
@@ -203,17 +204,20 @@ export function BarterChainPlanner({
               {t("units")}
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {t("Weight of available goods:")}{" "}
-            {startUnitsRaw && Number.isFinite(Number(startUnitsRaw))
-              ? (Number(startUnitsRaw) * BARTER_TIERS[startTier].unitWeight).toLocaleString()
-              : "—"}{" "}
-            {t("LT; the recommended load is calculated below.")}
-          </p>
+          {startTier !== 0 && (
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {t("Weight of available goods:")}{" "}
+              {startUnitsRaw && Number.isFinite(Number(startUnitsRaw))
+                ? (Number(startUnitsRaw) * BARTER_TIERS[startTier].unitWeight).toLocaleString()
+                : "—"}{" "}
+              {t("LT; the recommended load is calculated below.")}
+            </p>
+          )}
         </div>
       </div>
 
       <BarterChainOfferEditor
+        debugEnabled={debugEnabled}
         steps={steps}
         ratioInputs={ratioInputs}
         onSelectRatio={selectRatio}

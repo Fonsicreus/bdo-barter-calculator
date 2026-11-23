@@ -7,6 +7,7 @@ import { BarterTradeForm } from "./BarterTradeForm";
 const NEXT_TIER_KEY = { 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7 };
 
 export function BarterCalculator({
+  debugEnabled = false,
   shipMaxWeight,
   finalCargoLimit,
   currentShipWeight,
@@ -26,7 +27,7 @@ export function BarterCalculator({
 
   const inputTier = BARTER_TIERS[inputTierKey];
   const outputTier = BARTER_TIERS[outputTierKey];
-  const inputUnitWeight = inputTier.unitWeight ?? customInputUnitWeight;
+  const inputUnitWeight = inputTierKey === 0 ? 0 : (inputTier.unitWeight ?? customInputUnitWeight);
   const outputUnitWeight = outputTier.unitWeight ?? customOutputUnitWeight;
   const resolvedInputTier = useMemo(
     () => ({ ...inputTier, unitWeight: inputUnitWeight }),
@@ -122,6 +123,7 @@ export function BarterCalculator({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <BarterTradeForm
+        debugEnabled={debugEnabled}
         inputTierKey={inputTierKey}
         onInputTierChange={handleInputTierChange}
         outputTierKey={outputTierKey}

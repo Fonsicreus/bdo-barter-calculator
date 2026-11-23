@@ -1,6 +1,7 @@
-import { Anchor, Compass, Gauge, Package, RefreshCw, Shield } from "lucide-react";
+import { Anchor, ChevronDown, Compass, Gauge, Package, RefreshCw, Shield } from "lucide-react";
 import { OFFICIAL_SHIPS } from "../data/ships";
 import { useLanguage } from "../i18n/LanguageContext";
+import { OverloadSettings } from "./OverloadSettings";
 
 const CATEGORIES = ["Tier 3 (Carrack)", "Tier 2 (Upgraded)", "Tier 1 (Base)", "Beginner"];
 
@@ -16,13 +17,16 @@ export function ShipSelector({
   isCapacityValid,
   capacityBonus,
   availableCapacity,
+  overloadEnabled,
+  onOverloadChange,
+  finalCargoLimit,
 }) {
   const { t } = useLanguage();
   const isCustomWeight = maxWeight !== selectedShip.baseWeight;
 
   return (
-    <div className="rounded-2xl p-5 sm:p-6 transition-colors duration-300 border bg-white border-slate-200/80 shadow-sm dark:bg-satella-card dark:border-satella-border/80 dark:shadow-satella-card">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100 dark:border-satella-border/60">
+    <details className="group rounded-2xl p-5 sm:p-6 transition-colors duration-300 border bg-white border-slate-200/80 shadow-sm dark:bg-satella-card dark:border-satella-border/80 dark:shadow-satella-card">
+      <summary className="flex cursor-pointer list-none flex-col gap-3 marker:hidden sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center space-x-2.5">
           <div className="p-2 rounded-xl bg-purple-50 text-purple-600 dark:bg-satella-surface dark:text-satella-primary">
             <Compass className="w-5 h-5" />
@@ -40,23 +44,26 @@ export function ShipSelector({
         </div>
 
         {/* Available cargo badge */}
-        <div className="flex items-center space-x-2 self-start sm:self-auto px-3 py-1.5 rounded-xl border bg-slate-50 border-slate-200 dark:bg-satella-surface dark:border-satella-border">
-          <Gauge className="w-4 h-4 text-purple-600 dark:text-satella-primary" />
-          <div className="text-right">
-            <div className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-400">
-              {t("Available Cargo")}
-            </div>
-            <div className="text-xs sm:text-sm font-mono font-bold text-purple-700 dark:text-satella-glow">
-              {isCapacityValid ? `${availableCapacity.toLocaleString()} LT` : "—"}
-            </div>
-            <div className="text-xs text-slate-400 dark:text-slate-500">
-              {isCapacityValid
-                ? t("of {weight} LT total", { weight: maxWeight.toLocaleString() })
-                : t("configure ship capacity")}
+        <div className="flex w-full items-center justify-between gap-3 sm:w-auto">
+          <div className="flex items-center space-x-2 self-start sm:self-auto px-3 py-1.5 rounded-xl border bg-slate-50 border-slate-200 dark:bg-satella-surface dark:border-satella-border">
+            <Gauge className="w-4 h-4 text-purple-600 dark:text-satella-primary" />
+            <div className="text-right">
+              <div className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-400">
+                {t("Available Cargo")}
+              </div>
+              <div className="text-xs sm:text-sm font-mono font-bold text-purple-700 dark:text-satella-glow">
+                {isCapacityValid ? `${availableCapacity.toLocaleString()} LT` : "—"}
+              </div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">
+                {isCapacityValid
+                  ? t("of {weight} LT total", { weight: maxWeight.toLocaleString() })
+                  : t("configure ship capacity")}
+              </div>
             </div>
           </div>
+          <ChevronDown className="h-5 w-5 shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
         </div>
-      </div>
+      </summary>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5 mt-5">
         {/* Ship Dropdown */}
@@ -67,7 +74,7 @@ export function ShipSelector({
           >
             <span>{t("Official BDO Vessel")}</span>
             <span className="text-xs text-purple-600 dark:text-satella-glow font-normal">
-              Base: {selectedShip.baseWeight.toLocaleString()} LT
+              {t("Base:")} {selectedShip.baseWeight.toLocaleString()} LT
             </span>
           </label>
           <div className="relative">
@@ -110,6 +117,11 @@ export function ShipSelector({
               {t("Cabins:")} {selectedShip.cabins}
             </span>
           </div>
+          <OverloadSettings
+            enabled={overloadEnabled}
+            onEnabledChange={onOverloadChange}
+            finalCargoLimit={finalCargoLimit}
+          />
         </div>
 
         {/* Actual Max Cargo Input */}
@@ -232,6 +244,6 @@ export function ShipSelector({
           )}
         </span>
       </div>
-    </div>
+    </details>
   );
 }

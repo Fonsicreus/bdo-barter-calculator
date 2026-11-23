@@ -1,12 +1,13 @@
-import { BookOpen, Coins, HelpCircle } from "lucide-react";
+import { BookOpen, ChevronDown, Coins, HelpCircle } from "lucide-react";
 import { BARTER_TIERS, ORDERED_TIER_KEYS } from "../data/barterTiers";
 import { useLanguage } from "../i18n/LanguageContext";
+import { BarterUnlockReference } from "./BarterUnlockReference";
 
 export function QuickReference() {
   const { t } = useLanguage();
   return (
-    <div className="rounded-2xl p-5 sm:p-6 transition-colors duration-300 border bg-white border-slate-200/80 shadow-sm dark:bg-satella-card dark:border-satella-border/80 dark:shadow-satella-card">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-satella-border/60">
+    <details className="group rounded-2xl p-5 sm:p-6 transition-colors duration-300 border bg-white border-slate-200/80 shadow-sm dark:bg-satella-card dark:border-satella-border/80 dark:shadow-satella-card">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 marker:hidden">
         <div className="flex items-center space-x-2.5">
           <div className="p-2 rounded-xl bg-purple-50 text-purple-600 dark:bg-satella-surface dark:text-satella-primary">
             <BookOpen className="w-5 h-5" />
@@ -22,7 +23,10 @@ export function QuickReference() {
             </p>
           </div>
         </div>
-      </div>
+        <ChevronDown className="h-5 w-5 shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
+      </summary>
+
+      <BarterUnlockReference />
 
       <div className="overflow-x-auto mt-4">
         <table className="w-full text-left text-xs">
@@ -164,6 +168,6 @@ export function QuickReference() {
           </li>
         </ul>
       </div>
-    </div>
+    </details>
   );
 }
