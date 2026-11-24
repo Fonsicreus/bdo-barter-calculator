@@ -48,6 +48,14 @@
 - 선박 기본 적재 한도와 항로 해금 조건. [BDO Codex](https://bdocodex.com/us/) · [Black Desert Foundry](https://www.blackdesertfoundry.com/bartering-guide/)
 - 돌발 물물교환 조건 변경 사항. [펄어비스 패치 노트](https://www.tw.playblackdesert.com/zh-TW/News/Detail?countryType=zh-TW&groupContentNo=19419)
 
+## 선박 증축 계산기
+
+[물물교환 계산기](https://fonsicreus.github.io/bdo-barter-calculator/) · [선박 증축 계산기](https://fonsicreus.github.io/bdo-barter-calculator/ship-upgrades/)
+
+현재 선박과 증축 목표를 선택해 중범선 4종과 길드 갤리선을 포함한 나루터 증축 경로 13개를 계획할 수 있습니다. 판옥선과 같은 직접 제작은 대상이 아닙니다. **선박 장비**에서 제작식과 강화를, **선박 증축**에서 최종 납품 목록을 확인하세요. 경로를 바꿔도 이 브라우저에 저장된 보유 수량이나 강화 단계는 변경되지 않습니다.
+
+**획득 방법**에는 개당 가격, **구매 비용**에는 부족분의 합계를 표시합니다. 필요한 까마귀 주화는 가격이 확인된 상점 구매에 한해 계산하며, 보유 잔액을 차감합니다. 중범선은 기본적으로 첫 시도 성공을 가정합니다. **고대의 모루**를 켜면 남은 단계마다 아그리스의 정수 0에서 확정 성공까지의 실패와 성공을 계산합니다. 기억의 파편 복구 비용은 보유 수량과 직접 입력한 통합 거래소 가격으로 추정합니다. [BDO Codex](https://bdocodex.com/kr/) · [펄어비스 PC 아시아 패치 노트](https://blackdesert.pearlabyss.com/Asia/en-US/News/Notice/Detail?_boardNo=13225)
+
 ## 로컬에서 실행
 
 [Bun](https://bun.sh)을 설치한 뒤 프로젝트 디렉터리에서 다음 명령을 실행하세요. Vite가 터미널에 표시한 로컬 주소를 브라우저에서 여세요.

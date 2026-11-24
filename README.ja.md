@@ -48,6 +48,14 @@
 - 船舶の基本積載重量と交易路の解放条件。 [BDO Codex](https://bdocodex.com/us/) · [Black Desert Foundry](https://www.blackdesertfoundry.com/bartering-guide/)
 - 突発物々交換の条件変更。 [Pearl Abyssのパッチノート](https://www.tw.playblackdesert.com/zh-TW/News/Detail?countryType=zh-TW&groupContentNo=19419)
 
+## 船舶増築計算機
+
+[物々交換計算機](https://fonsicreus.github.io/bdo-barter-calculator/) · [船舶増築計算機](https://fonsicreus.github.io/bdo-barter-calculator/ship-upgrades/)
+
+現在の船舶と増築先を選び、重帆船4種やギルドガレー船を含む渡し場での増築13ルートを計画できます。板屋船などの直接製作は対象外です。「船舶装備」でレシピと強化を、「船舶増築」で最終納品を確認できます。ルートを変更しても、このブラウザーに保存されている所持数や強化段階は変更されません。
+
+「入手方法」には単価、「購入費用」には不足分の合計を表示します。必要なカラスコインは価格が確認された商店購入のみを対象とし、所持残高を差し引きます。重帆船のルートでは初回成功が初期設定です。「天井」を有効にすると、残りの各段階でアグリスの精髄が0から古代の金床による確定成功に至るまでの失敗と成功を数えます。記憶の破片での修理費用は所持数と入力した統合取引所の価格から見積もります。[BDO Codex](https://bdocodex.com/jp/) · [Pearl AbyssのPCアジアパッチノート](https://blackdesert.pearlabyss.com/Asia/en-US/News/Notice/Detail?_boardNo=13225)
+
 ## ローカルで実行する
 
 Bunをインストールし、プロジェクトのディレクトリで次のコマンドを実行してください。起動後は、Viteがターミナルに表示するローカルアドレスを開いてください。 [Bunのインストール](https://bun.sh)

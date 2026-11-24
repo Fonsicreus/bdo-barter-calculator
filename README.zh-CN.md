@@ -48,6 +48,18 @@
 - 船体基础载重和航线解锁条件。[BDO Codex](https://bdocodex.com/us/) · [Black Desert Foundry](https://www.blackdesertfoundry.com/bartering-guide/)
 - 突发物品交换条件的变更。[Pearl Abyss 更新公告](https://www.tw.playblackdesert.com/zh-TW/News/Detail?countryType=zh-TW&groupContentNo=19419)
 
+## 船舶扩建计算器
+
+[以物易物计算器](https://fonsicreus.github.io/bdo-barter-calculator/) · [船舶扩建计算器](https://fonsicreus.github.io/bdo-barter-calculator/ship-upgrades/)
+
+2.0 版支持 **13 条渡口扩建路线**，覆盖巴特利帆船至四种艾裴里亚重帆船，以及公会桨帆船的扩建。选择当前船舶和目标。在「船舶装备」查看制作配方和强化需求，在「船舶扩建」查看最终交付的材料。板屋船等直接建造的船舶不在规划范围内。
+
+- 「获取方式」显示商店单价，「购买费用」显示缺少物品的总价。乌鸦硬币估算仅计入商店价格已核实的物品，并扣除当前余额；不包含银币或其他获取途径。
+- 可以记录已有装备、材料和本周还可购买的箱数。库存保存在浏览器中，切换路线不会消耗材料。
+- 重帆船路线默认假设首次强化成功。打开「保底」后，每个剩余阶段均从 0 点阿戈里斯精髓开始，计入古代铁砧生效前的所有失败。记忆残片的银币费用按用户输入的价格单独计算。
+
+数据和名称来自 [BDO Codex](https://bdocodex.com/cn/)。价格参考 [Pearl Abyss PC 亚洲服更新公告](https://blackdesert.pearlabyss.com/Asia/en-US/News/Notice/Detail?_boardNo=13225)及社区截图。请核对所在服务器的价格和购买限制。
+
 ## 在本地运行
 
 安装 [Bun](https://bun.sh)，然后在项目目录中运行以下命令。打开 Vite 在终端中显示的本地地址。

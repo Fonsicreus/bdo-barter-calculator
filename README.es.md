@@ -48,6 +48,18 @@ Introduce el máximo de LT que muestra la información del barco con el equipo, 
 - Capacidades de barcos y desbloqueo de rutas. [BDO Codex](https://bdocodex.com/us/) · [Black Desert Foundry](https://www.blackdesertfoundry.com/bartering-guide/)
 - Cambios en los requisitos del trueque especial. [Notas del parche de Pearl Abyss](https://www.tw.playblackdesert.com/zh-TW/News/Detail?countryType=zh-TW&groupContentNo=19419)
 
+## Calculadora de mejoras de barcos
+
+[Calculadora de trueques](https://fonsicreus.github.io/bdo-barter-calculator/) · [Calculadora de mejoras de barcos](https://fonsicreus.github.io/bdo-barter-calculator/ship-upgrades/)
+
+En la versión 2.0 puedes planificar **13 mejoras de embarcadero**, desde el velero de Bartali hasta las cuatro carracas, incluida la galera del gremio. Selecciona el barco actual y el destino. En **Equipamiento del barco** están las recetas y los refuerzos; en **Mejora del barco**, los materiales de entrega. La fabricación directa, como la del Panokseon, no está incluida.
+
+- **Obtención** muestra el precio por unidad; **Coste total** muestra lo que cuestan las unidades que faltan. La estimación de corvarios solo incluye precios confirmados de la tienda y descuenta tu saldo. No incluye plata ni adquisiciones por otras vías.
+- Puedes marcar las piezas que tienes, introducir cantidades y registrar las cajas semanales disponibles. El inventario se guarda en este navegador y se comparte entre rutas sin consumir materiales al cambiar de barco.
+- Para las carracas, la estimación base supone éxito al primer intento. **Yunque ancestral** cuenta los fallos hasta el éxito garantizado en cada nivel pendiente, partiendo de cero esencias de Agris. El coste en plata de los recuerdos efímeros se calcula por separado con el precio que indiques.
+
+Datos y nombres: [BDO Codex](https://bdocodex.com/es/). Precios: [actualización de Pearl Abyss para PC Asia](https://blackdesert.pearlabyss.com/Asia/en-US/News/Notice/Detail?_boardNo=13225) y capturas de la comunidad. Comprueba los precios y los límites en tu servidor.
+
 ## Cómo ejecutarlo en local
 
 Instala [Bun](https://bun.sh) y ejecuta estos comandos en la carpeta del proyecto. Abre la dirección local que Vite muestre en la terminal.

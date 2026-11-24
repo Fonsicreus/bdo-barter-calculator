@@ -1,10 +1,12 @@
 import { afterEach, expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import { LanguageProvider } from "../src/i18n/LanguageContext";
 import { ItemIcon, ShipUpgradeApp, resolveLocalIcon } from "../src/ship-upgrades/ShipUpgradeApp";
 import { calculatePlan } from "../src/ship-upgrades/calculatePlan";
 import { advanceCatalog } from "../src/ship-upgrades/catalog";
 import { fleet } from "../src/ship-upgrades/fleet";
 import { INVENTORY_COOKIE_NAME } from "../src/ship-upgrades/inventory";
+import { shipUpgradeMessages } from "../src/ship-upgrades/messages";
 
 const catalog = {
   items: {
@@ -79,6 +81,43 @@ test("guild routes don't present unavailable enhancements or Crow Coin quotes", 
   expect(html).not.toContain("Stone boxes remaining this week");
   expect(html).not.toContain("Ivory Figurehead +10");
 });
+
+test.each([
+  [
+    "es",
+    "Español",
+    "Calculadora de mejoras de barcos",
+    "Barco actual",
+    "Fibra de Kaniwha",
+    "40 corvarios por unidad",
+  ],
+  ["zh-CN", "简体中文", "船舶扩建计算器", "当前船舶", "印着月之血管的亚麻布", "每件 40 乌鸦硬币"],
+])(
+  "the upgrade page renders the saved %s language and localized prices",
+  (locale, language, title, currentShip, material, unitPrice) => {
+    const previousStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: { getItem: (key) => (key === "bdo-language" ? locale : null) },
+    });
+    try {
+      const html = renderToStaticMarkup(
+        <LanguageProvider messages={shipUpgradeMessages} setPageTitle={false}>
+          <ShipUpgradeApp fleet={fleet} calculatePlan={calculatePlan} />
+        </LanguageProvider>,
+      );
+      expect(html).toContain(`lang="${locale}" class="ship-upgrade-app`);
+      expect(html).toContain(`aria-label="${language}" aria-pressed="true"`);
+      expect(html).toContain(`${title}</a>`);
+      expect(html).toContain(`${currentShip}</label>`);
+      expect(html).toContain(material);
+      expect(html).toContain(unitPrice);
+    } finally {
+      if (previousStorage) Object.defineProperty(globalThis, "localStorage", previousStorage);
+      else Reflect.deleteProperty(globalThis, "localStorage");
+    }
+  },
+);
 
 function renderApp(inventory = {}, override = {}) {
   Object.defineProperty(globalThis, "document", {
