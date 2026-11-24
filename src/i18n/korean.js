@@ -457,5 +457,5 @@ export const korean = {
     "항로 전체에서 선박의 적재 한도를 준수합니다.",
   "Black Desert Online Barter Trade & Weight Calculator": "검은사막 물물교환 및 적재 무게 계산기",
   "Crafted with": "정성을 담아",
-  in: "제작 ·",
+  by: "제작 ·",
 };

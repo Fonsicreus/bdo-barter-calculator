@@ -2,9 +2,11 @@
 
 **English** · [Español](README.es.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md)
 
-Work out what to load at port, how heavy your cargo will be after each island, and how many goods you can bring home. Satella maintains this unofficial Black Desert Online planner.
+Plan cargo and barter routes, then work out which ship parts and Crow Coins you still need. **BDO Barter Calculator 2.0** brings both tools together in an unofficial Black Desert Online planner by [Satella](https://github.com/Fonsicreus).
 
-Use the language selector to switch between English, Spanish, Korean, Japanese, and Simplified Chinese.
+**Open the app:** [Barter Calculator](https://fonsicreus.github.io/bdo-barter-calculator/) · [Ship Upgrade Calculator](https://fonsicreus.github.io/bdo-barter-calculator/ship-upgrades/)
+
+Both tools support English, Español, 한국어, 日本語, and 简体中文. Your language and theme carry across pages.
 
 ## What you can plan
 
@@ -16,6 +18,16 @@ Use the language selector to switch between English, Spanish, Korean, Japanese, 
 | **Goods reference** | Look up item weights, NPC sale prices, route unlock counts, and Special Barter requirements. |
 
 For a first calculation, select your ship, enter its maximum LT from **Ship Info**, and choose **Single trade**. For example, if an island offers two Level 2 goods for one Level 1 good, four exchanges turn 400 LT of goods into 3,200 LT. Any other cargo already on board adds to both totals.
+
+## Ship Upgrade Calculator
+
+Use **Ship Upgrade Calculator** in the header to open `/ship-upgrades/`. Choose **Current ship** and **Upgrade to** to plan one of 13 wharf upgrades: Bartali to Sailboat or Frigate, the optional Improved variants, Caravel and Galleass, all four Carracks, and the guild Galley upgrade. Direct builds such as [Panokseon](https://blackdesert.pearlabyss.com/Asia/fr-FR/News/Notice/Detail?_boardNo=3855), licenses, and gear worn by a finished Carrack or Panokseon are outside the planner.
+
+- Use **Ship Equipment** for gear, recipes, stones and repairs, and **Ship Upgrade** for the final hand-in. Owning a blue part hides its matching green part and recipe without deleting progress. The one-year inventory cookie saves the selected route, gear levels, stock, balance, and available boxes. Routes share inventory by item ID; switching does not spend anything. Reset from **Inventory** without affecting barter settings, theme, or language.
+- **Acquisition** shows the Crow Coin price per unit; **Purchase cost** shows the total for missing units. **Still to earn** subtracts your balance from confirmed shop costs. It excludes silver, guild funds, barter, and other unpriced acquisitions. The planner finds the cheapest combination of individual Tidal Black Stones and available boxes. On Carrack routes, the default assumes first-attempt success; **Pity** counts all failures to the [Ancient Anvil](https://www.sa.playblackdesert.com/pt-BR/Wiki?wikiNo=395) guarantee from zero Agris Essence per level, plus the success.
+- The worst-case repair estimate budgets full max-durability restoration with [Memory Fragments (44195)](https://bdoatlas.com/item/44195/memory-fragment/): +5 for green and +2 for blue per fragment. The repair summary and materials table subtract the fragments you own and use your editable Central Market price. The optional 2.27M PC EU reference is a [Garmoth](https://garmoth.com/market/category/enhancement-upgrade/enhancement/) snapshot from November 24, 2026, not a live quote. This does not model force enhancement, existing wear, other repair methods, or alternative purchases.
+- PC data checked November 24, 2026. The app links to each destination's BDO Codex upgrade record (English PC database), and to workshop designs [8839–8842](https://bdocodex.com/us/design/8839/) for Caravel and [8847–8850](https://bdocodex.com/us/design/8847/) for Galleass. Shop prices use [Pearl Abyss's May 21, 2026 PC Asia update](https://blackdesert.pearlabyss.com/Asia/en-US/News/Notice/Detail?_boardNo=13225) and community shop screenshots, including [Cobalt Ingot (5819)](https://bdocodex.com/us/item/5819/) at 120 and [Deep Sea Memory Filled Glue (5825)](https://bdocodex.com/us/item/5825/) at 110. Check prices and limits on your server.
+- Black Desert Online artwork belongs to Pearl Abyss. Icons are sourced from [BDO Atlas](https://bdoatlas.com/), [BDO Codex](https://bdocodex.com/us/items/), and in-game screenshots. The code license does not apply to these assets. This is an unofficial fan project and is not endorsed by Pearl Abyss.
 
 ## Barter data
 
@@ -69,6 +81,6 @@ Use `bun run preview` to serve the production build locally. A push to `main` tr
 
 ## Contributing and license
 
-The project uses AI assistance under human supervision. Contributors review generated changes and check barter data against patch notes and observations in the game. When reporting a data correction, include the game region, patch date, and evidence for the value. [Contribution guide](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md)
+The project uses AI assistance under human supervision. Contributors review generated changes and check game data against patch notes and observations in the game. When reporting a data correction, include the game region, patch date, and evidence for the value. [Contribution guide](CONTRIBUTING.md) · [Agent guide](AGENTS.md) · [Code of conduct](CODE_OF_CONDUCT.md)
 
 The project code uses PolyForm Noncommercial 1.0.0. Commercial use requires separate permission. Black Desert Online is a Pearl Abyss game. [License](LICENSE.md)

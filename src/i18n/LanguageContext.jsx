@@ -5,10 +5,16 @@ import { LOCALES } from "./locales";
 import { simplifiedChinese } from "./simplifiedChinese";
 import { spanish } from "./spanish";
 
-const LanguageContext = createContext(null);
 const translations = { es: spanish, ko: korean, ja: japanese, "zh-CN": simplifiedChinese };
+const LanguageContext = createContext({ language: "en", t: interpolate });
 
-export function LanguageProvider({ children }) {
+function interpolate(text, values = {}) {
+  return text.replace(/\{(\w+)\}/g, (match, key) =>
+    Object.hasOwn(values, key) ? String(values[key]) : match,
+  );
+}
+
+export function LanguageProvider({ children, messages, setPageTitle = true }) {
   const [language, setLanguage] = useState(() => {
     try {
       const savedLanguage = localStorage.getItem("bdo-language");
@@ -18,21 +24,28 @@ export function LanguageProvider({ children }) {
     }
   });
   const dictionary = translations[language];
+  const extra = messages?.[language];
 
   useEffect(() => {
     document.documentElement.lang = language;
-    document.title = dictionary?.["BDO Barter Calculator"] ?? "BDO Barter Calculator";
+    if (setPageTitle) {
+      document.title = dictionary?.["BDO Barter Calculator"] ?? "BDO Barter Calculator";
+    }
     try {
       localStorage.setItem("bdo-language", language);
     } catch {
       // Language selection remains available for this session.
     }
-  }, [dictionary, language]);
+  }, [dictionary, language, setPageTitle]);
 
   const t = (text, values = {}) => {
-    const translated = dictionary && Object.hasOwn(dictionary, text) ? dictionary[text] : text;
-    return translated.replace(/\{(\w+)\}/g, (match, key) =>
-      Object.hasOwn(values, key) ? String(values[key]) : match,
+    return interpolate(
+      extra && Object.hasOwn(extra, text)
+        ? extra[text]
+        : dictionary && Object.hasOwn(dictionary, text)
+          ? dictionary[text]
+          : text,
+      values,
     );
   };
   return (

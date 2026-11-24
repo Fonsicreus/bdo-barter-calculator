@@ -461,5 +461,5 @@ export const spanish = {
   "Black Desert Online Barter Trade & Weight Calculator":
     "Calculadora de trueques y peso de Black Desert Online",
   "Crafted with": "Creado con",
-  in: "en",
+  by: "por",
 };

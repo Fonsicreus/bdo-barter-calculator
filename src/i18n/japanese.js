@@ -454,5 +454,5 @@ export const japanese = {
     "すべての寄港地を含む航路が船舶の重量上限内に収まります。",
   "Black Desert Online Barter Trade & Weight Calculator": "黒い砂漠 物々交換・積載重量計算機",
   "Crafted with": "心を込めて制作",
-  in: "テーマ：",
+  by: "制作者：",
 };

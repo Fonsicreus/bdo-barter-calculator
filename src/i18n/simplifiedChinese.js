@@ -442,5 +442,5 @@ export const simplifiedChinese = {
   "Complete route fits within the ship's weight limit.": "全程均符合船舶载重上限。",
   "Black Desert Online Barter Trade & Weight Calculator": "黑色沙漠以物易物与载重计算器",
   "Crafted with": "用",
-  in: "制作 · 主题：",
+  by: "制作 · 作者：",
 };

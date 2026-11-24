@@ -1,4 +1,3 @@
-import { Anchor, Heart } from "lucide-react";
 import { useState } from "react";
 import { BarterCalculator } from "./components/BarterCalculator";
 import { BarterChainPlanner } from "./components/BarterChainPlanner";
@@ -6,6 +5,7 @@ import { Header } from "./components/Header";
 import { QuickReference } from "./components/QuickReference";
 import { RouteTradeForm } from "./components/RouteTradeForm";
 import { ShipSelector } from "./components/ShipSelector";
+import { SiteFooter } from "./components/SiteFooter";
 import { TradeMenuTabs } from "./components/TradeMenuTabs";
 import { TripPlanner } from "./components/TripPlanner";
 import { useShipConfig } from "./hooks/useShipConfig";
@@ -15,7 +15,7 @@ import { getOverloadCapacity } from "./utils/overload";
 
 export function App() {
   const { t } = useLanguage();
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const {
     selectedShip,
     selectShip,
@@ -62,7 +62,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-300">
+    <div className="min-h-screen flex flex-col">
       <Header
         theme={theme}
         onToggleTheme={toggleTheme}
@@ -168,24 +168,7 @@ export function App() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto border-t border-slate-200 dark:border-satella-border/60 py-6 bg-white/50 dark:bg-satella-base/50 text-xs text-slate-500 dark:text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center space-x-2">
-            <Anchor className="w-4 h-4 text-purple-600 dark:text-satella-primary" />
-            <span>{t("Black Desert Online Barter Trade & Weight Calculator")}</span>
-          </div>
-
-          <div className="flex items-center space-x-1.5 text-xs">
-            <span>{t("Crafted with")}</span>
-            <Heart className="w-3.5 h-3.5 text-purple-500 fill-purple-500 inline" />
-            <span>{t("in")}</span>
-            <span className="font-semibold text-purple-600 dark:text-satella-glow">
-              {isDark ? "Satella Shadow Violet" : "Silver Mist"}
-            </span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter description={t("Black Desert Online Barter Trade & Weight Calculator")} t={t} />
     </div>
   );
 }

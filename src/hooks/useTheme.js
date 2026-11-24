@@ -1,31 +1,35 @@
-import { useEffect, useState } from "react";
-import { getCookie, setCookie } from "../utils/cookies";
-
-const THEME_COOKIE_NAME = "bdo_theme";
+import { useRef, useState } from "react";
+import { setCookie } from "../utils/cookies";
+import { THEME_COOKIE_NAME } from "../utils/theme";
 
 export function useTheme() {
   const [theme, setTheme] = useState(() => {
-    const saved = getCookie(THEME_COOKIE_NAME);
-    if (saved === "light" || saved === "dark") {
-      return saved;
-    }
-    // Default to dark (Satella Re:Zero theme)
-    return "dark";
+    const root = typeof document === "undefined" ? null : document.documentElement;
+    return root && !root.classList.contains("dark") ? "light" : "dark";
   });
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    setCookie(THEME_COOKIE_NAME, theme, 365);
-  }, [theme]);
+  const themeFrame = useRef(null);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    const root = document.documentElement;
+    root.classList.add("theme-switching");
+    const isDark = root.classList.toggle("dark");
+    const nextTheme = isDark ? "dark" : "light";
+    setTheme(nextTheme);
+
+    if (themeFrame.current !== null) cancelAnimationFrame(themeFrame.current);
+    themeFrame.current = requestAnimationFrame(() => {
+      themeFrame.current = requestAnimationFrame(() => {
+        root.classList.remove("theme-switching");
+        themeFrame.current = null;
+      });
+    });
+
+    try {
+      setCookie(THEME_COOKIE_NAME, nextTheme, 365);
+    } catch {
+      return;
+    }
   };
 
-  return { theme, setTheme, toggleTheme, isDark: theme === "dark" };
+  return { theme, toggleTheme };
 }

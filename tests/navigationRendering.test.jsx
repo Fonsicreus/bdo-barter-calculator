@@ -28,6 +28,10 @@ test("ship configuration is a collapsed disclosure and keeps cargo visible", () 
   expect(html).toMatch(/<summary[^>]*>.*Available Cargo.*<\/summary>/);
   expect(html).toMatch(/19[,.\s]?300 LT/);
   expect(html).toContain('id="max-weight-input"');
+  expect(html).toContain("custom-number-stepper");
+  expect(html).toContain('aria-label="Actual Max Cargo (from Ship Info): +1"');
+  expect(html).toContain('aria-label="Pre-loaded Cargo (LT): −10"');
+  expect(html).toContain('<select id="ship-select"');
   expect(html).toContain('aria-pressed="false"');
   expect(html).toContain("Overload");
 });

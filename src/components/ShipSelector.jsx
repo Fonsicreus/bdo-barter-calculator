@@ -1,6 +1,7 @@
 import { Anchor, ChevronDown, Compass, Gauge, Package, RefreshCw, Shield } from "lucide-react";
 import { OFFICIAL_SHIPS } from "../data/ships";
 import { useLanguage } from "../i18n/LanguageContext";
+import { NumberStepper } from "./NumberStepper";
 import { OverloadSettings } from "./OverloadSettings";
 
 const CATEGORIES = ["Tier 3 (Carrack)", "Tier 2 (Upgraded)", "Tier 1 (Base)", "Beginner"];
@@ -144,28 +145,23 @@ export function ShipSelector({
               </button>
             )}
           </div>
-          <div className="relative">
-            <input
-              id="max-weight-input"
-              type="number"
-              min={1}
-              step={1}
-              inputMode="numeric"
-              aria-invalid={maxWeightError ? "true" : "false"}
-              aria-describedby={`max-weight-help${maxWeightError ? " max-weight-error" : ""}`}
-              value={maxWeight || ""}
-              onChange={(e) => onMaxWeightChange(Number.parseFloat(e.target.value) || 0)}
-              className={`w-full rounded-xl px-3.5 py-2.5 text-sm font-mono font-semibold transition-colors duration-200 border bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 dark:bg-satella-surface dark:text-satella-silver-glow pr-12 ${
-                maxWeightError
-                  ? "border-rose-400 focus:ring-rose-500 dark:border-rose-700"
-                  : "border-slate-300 focus:ring-purple-500 dark:border-satella-border dark:focus:ring-satella-primary"
-              }`}
-              placeholder={t("Enter live total")}
-            />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 dark:text-purple-300 pointer-events-none">
-              LT
-            </span>
-          </div>
+          <NumberStepper
+            id="max-weight-input"
+            label={t("Actual Max Cargo (from Ship Info)")}
+            min={1}
+            unit="LT"
+            aria-invalid={maxWeightError ? "true" : "false"}
+            aria-describedby={`max-weight-help${maxWeightError ? " max-weight-error" : ""}`}
+            value={maxWeight || ""}
+            onChange={(event) => onMaxWeightChange(Number.parseFloat(event.target.value) || 0)}
+            onStep={onMaxWeightChange}
+            className={`w-full rounded-xl px-3.5 py-2.5 text-sm font-mono font-semibold transition-colors duration-200 border bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 dark:bg-satella-surface dark:text-satella-silver-glow ${
+              maxWeightError
+                ? "border-rose-400 focus:ring-rose-500 dark:border-rose-700"
+                : "border-slate-300 focus:ring-purple-500 dark:border-satella-border dark:focus:ring-satella-primary"
+            }`}
+            placeholder={t("Enter live total")}
+          />
 
           <div
             id="max-weight-help"
@@ -212,22 +208,17 @@ export function ShipSelector({
           >
             {t("Pre-loaded Cargo (LT)")}
           </label>
-          <div className="relative">
-            <input
-              id="current-cargo-input"
-              type="number"
-              min={0}
-              step={10}
-              inputMode="numeric"
-              value={currentCargo === 0 ? "" : currentCargo}
-              onChange={(e) => onCurrentCargoChange(Number.parseFloat(e.target.value) || 0)}
-              className="w-full rounded-xl px-3.5 py-2.5 text-sm font-mono font-medium transition-colors duration-200 border bg-slate-50 text-slate-900 border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border dark:focus:ring-satella-primary pr-12"
-              placeholder={t("0 (Empty)")}
-            />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 dark:text-purple-300 pointer-events-none">
-              LT
-            </span>
-          </div>
+          <NumberStepper
+            id="current-cargo-input"
+            label={t("Pre-loaded Cargo (LT)")}
+            step={10}
+            unit="LT"
+            value={currentCargo === 0 ? "" : currentCargo}
+            onChange={(event) => onCurrentCargoChange(Number.parseFloat(event.target.value) || 0)}
+            onStep={onCurrentCargoChange}
+            className="w-full rounded-xl px-3.5 py-2.5 text-sm font-mono font-medium transition-colors duration-200 border bg-slate-50 text-slate-900 border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-satella-surface dark:text-satella-silver dark:border-satella-border dark:focus:ring-satella-primary"
+            placeholder={t("0 (Empty)")}
+          />
           <p className="text-xs text-slate-400 dark:text-slate-500 flex items-start gap-1 pt-1">
             <Package className="w-3 h-3 shrink-0 mt-0.5" />
             {t(

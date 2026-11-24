@@ -29,22 +29,15 @@
 @layer base {
   :root {
     font-size: 17px;
-    color-scheme: light;
-  }
-
-  :root.dark {
-    color-scheme: dark;
   }
 
   body {
-    background-color: #f8fafc;
+    background-color: var(--page-background);
     color: #1e293b;
-    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   .dark body {
     /* Satella: Deep obsidian void with ethereal purple shadows */
-    background-color: #080611;
     color: #e2e8f0;
     background-image: radial-gradient(
         ellipse 80% 50% at 50% -20%,
@@ -52,6 +45,36 @@
         transparent 70%
       ), radial-gradient(ellipse 60% 40% at 90% 80%, rgba(168, 85, 247, 0.08), transparent 60%);
   }
+}
+
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
+select:not([multiple]):not([size]) {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%237e22ce' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  background-position: right 0.75rem center;
+  padding-inline-end: 2.25rem;
+}
+
+.dark select:not([multiple]):not([size]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23d8b4fe' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+}
+
+input.custom-number-stepper {
+  appearance: textfield;
+}
+
+input.custom-number-stepper::-webkit-inner-spin-button,
+input.custom-number-stepper::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
 }
 
 /* Custom scrollbar matching Satella's aesthetic */
