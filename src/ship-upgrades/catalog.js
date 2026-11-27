@@ -83,6 +83,7 @@ export const advanceCatalog = {
     [stoneId]: {
       name: "Tidal Black Stone",
       category: "enhancement",
+      hideWhenNotRequired: true,
       icon: materialIcon(stoneId),
       source: "Crow Coin Shop · individual stones or boxes of 20",
       shop: { unitPrice: 10, bundle: { price: 150, quantity: 20, weeklyLimit: 10 } },

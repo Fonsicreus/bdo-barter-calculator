@@ -3,17 +3,19 @@ import { readFileSync } from "node:fs";
 import { LOCALES } from "../src/i18n/locales";
 import { fleet } from "../src/ship-upgrades/fleet";
 import { shipUpgradeMessages } from "../src/ship-upgrades/messages";
+import { sailingMaterials, sailingQuests } from "../src/ship-upgrades/sailingSources";
 
-const shipUpgradeSource = readFileSync(
-  new URL("../src/ship-upgrades/ShipUpgradeApp.jsx", import.meta.url),
-  "utf8",
-);
+const shipUpgradeSource = ["ShipUpgradeApp.jsx", "MaterialSources.jsx"]
+  .map((file) => readFileSync(new URL(`../src/ship-upgrades/${file}`, import.meta.url), "utf8"))
+  .join("\n");
 const messageKeys = new Set([
   ...[...shipUpgradeSource.matchAll(/\bt\(\s*("(?:[^"\\]|\\.)*")/g)].map((match) =>
     JSON.parse(match[1]),
   ),
   ...fleet.routes.flatMap(({ originName, destinationName }) => [originName, destinationName]),
   ...Object.values(fleet.items).flatMap(({ name, source }) => (source ? [name, source] : [name])),
+  ...sailingQuests.map(({ name }) => name),
+  ...Object.values(sailingMaterials).flatMap(({ khan }) => (khan ? [khan] : [])),
   "Ship Upgrade",
   "Ship Equipment",
   "Calculators",

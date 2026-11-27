@@ -60,6 +60,8 @@
 
 数据和名称来自 [BDO Codex](https://bdocodex.com/cn/)。价格参考 [Pearl Abyss PC 亚洲服更新公告](https://blackdesert.pearlabyss.com/Asia/en-US/News/Notice/Detail?_boardNo=13225)及社区截图。请核对所在服务器的价格和购买限制。
 
+在「船舶装备」中，每个待制作部件都有默认展开的材料明细，拥有该部件后会隐藏此明细。不同部件所需的相同材料共享库存及缺少数量。将鼠标移至获取方式标签上或点按标签，可查看每日及每周任务，并区分完成任务必得的奖励与需要选择的奖励。部件布局和材料获取指南参考了 [BDO Workshop](https://bdoworkshop.com/carrack-resource-management)；任务奖励已与 BDO Codex 核对。
+
 ## 在本地运行
 
 安装 [Bun](https://bun.sh)，然后在项目目录中运行以下命令。打开 Vite 在终端中显示的本地地址。

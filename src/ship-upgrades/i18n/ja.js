@@ -1,4 +1,55 @@
 export default {
+  "Required for this piece": "この部品の必要数",
+  "Missing in plan": "計画全体の不足数",
+  "Item cost in plan": "計画全体のアイテム費用",
+  "Each recipe shows what that piece needs. Owned amounts, shortages, and costs are shared across the whole plan.":
+    "各製作式にはその部品に必要な素材を表示します。所持数、不足数、費用は計画全体で共有されます。",
+  "Materials for {item}": "{item}の素材",
+  "Shared enhancement materials": "共通の強化素材",
+  "Per-piece layout and gathering guide inspired by": "部品別の構成と素材収集ガイドの参考：",
+  "Quest rewards checked against BDO Codex. Some rewards must be selected.":
+    "依頼報酬はBDO Codexと照合しました。一部の報酬は選択する必要があります。",
+  "Up to +{count}/day": "1日最大 +{count}",
+  "+{count}/day": "1日 +{count}",
+  "Up to +{count}/week": "週最大 +{count}",
+  "+{count}/week": "週 +{count}",
+  "Daily quest": "デイリー依頼",
+  "Weekly quest": "週間依頼",
+  "{quest}: +{count} if you select this reward.": "{quest}：この報酬を選択すると +{count}。",
+  "{quest}: +{count} guaranteed on completion.": "{quest}：完了時に +{count} を確定獲得。",
+  Bartering: "物々交換",
+  "Exchange sea trade goods when an offer is available.":
+    "交換の対象に表示されたときに海上交易品を物々交換します。",
+  "Exchange level {level} sea trade goods when an offer is available.":
+    "交換の対象に表示されたときに{level}段階の海上交易品を物々交換します。",
+  "Crow Coin Shop": "カラスコイン商店",
+  "Khan loot": "カーンの戦利品",
+  "Dry one {item} to get {quantity} of this material.":
+    "{item}を1個乾燥させると、この素材を{quantity}個獲得できます。",
+  "Exploration quest": "探索依頼",
+  "Check island exploration quests for this reward. No fixed daily yield.":
+    "この報酬を得られる島の探索依頼を確認してください。1日の獲得量は決まっていません。",
+  Fishing: "釣り",
+  "Rare catch at Papua Crinea. No fixed daily yield.":
+    "パプアクリニでまれに釣れます。1日の獲得量は決まっていません。",
+  "Sea monster drop": "海洋怪獣のドロップ",
+  "Can drop from sea monsters. No fixed daily yield.":
+    "海洋怪獣からドロップすることがあります。1日の獲得量は決まっていません。",
+  "NPC vendor": "NPC商人",
+  "Old Moon Guild's Young Sea Monster Hunter": "終末の月ギルドの幼い海洋怪獣ハンター",
+  "Win-win Situation": "互いに利益となること",
+  "Our Guild is Not a Charity Group": "我がギルドは慈善団体ではない",
+  "Do You Have What it Takes?": "資格はあるか？",
+  "Lively Iliya Island": "活気あふれるイリヤ島",
+  "Supplies Delivery (Iliya Island)": "物資の配達（イリヤ島）",
+  "Supplies Delivery (Oquilla's Eye)": "物資の配達（オーキルアの目）",
+  "For the Young Otter Merchants": "幼いラッコ商人たちのために",
+  "Old Moon Guild's Candidum Hunter": "終末の月ギルドのキャンディドゥムハンター",
+  "Old Moon Guild's Nineshark Hunter": "終末の月ギルドのナインシャークハンター",
+  "Old Moon Guild's Black Rust Hunter": "終末の月ギルドのブラックラストハンター",
+  "Monster Increase Report": "怪獣増加報告",
+  "Khan's Tendon": "カーンの腱",
+  "Khan's Scale": "カーンの鱗",
   "Ship Upgrade": "船舶増築",
   "Ship Equipment": "船舶装備",
   Calculators: "計算機",
@@ -32,7 +83,6 @@ export default {
   "Required for this plan": "このルートで必要",
   "Not currently required": "現在は不要",
   "Base part owned": "装備を所持済み",
-  "Blue equipment recipes": "青等級装備の製作レシピ",
   "Craft in the level 4 Ship Part Workshop at Port Epheria 1-4, 2F. Each piece starts at +0.":
     "エフェリア港町1-4番地2階の4段階船舶部品工房で製作します。製作時の強化段階は+0です。",
   "Recipe source (BDO Codex)": "レシピ出典（BDO Codex）",
@@ -115,9 +165,7 @@ export default {
     "現在の装備の強化段階を入力してください。このルートでの強化はすべて確定成功です。",
   "The base equipment is enough for this upgrade. No enhancement is required.":
     "この増築には未強化の装備で十分です。強化は必要ありません。",
-  "Equipment materials & purchase plan": "装備素材と購入計画",
-  "Enter what you own. Fully owned and currently unused materials stay editable.":
-    "所持数を入力してください。必要数を満たした素材や現在使わない素材も編集できます。",
+  "Enter the quantities you already own.": "所持数を入力してください。",
   "Stone boxes remaining this week": "今週の強化石の箱の購入可能数",
   "0–10 available purchases. Update this manually when your weekly allowance changes.":
     "購入可能数は0〜10個です。週の購入枠が変わったら手動で更新してください。",

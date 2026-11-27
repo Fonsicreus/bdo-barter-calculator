@@ -23,7 +23,11 @@ const catalog = {
       source: "Local material source",
       shop: { unitPrice: 10 },
     },
-    stones: { name: "Enhancement stone", category: "enhancement" },
+    stones: {
+      name: "Enhancement stone",
+      category: "enhancement",
+      shop: { unitPrice: 10, bundle: { price: 150, quantity: 20, weeklyLimit: 10 } },
+    },
     unknown: { name: "Unpriced material", category: "material" },
     quest: { name: "Quest material", category: "material" },
     unused: { name: "Unused material", category: "material" },
@@ -295,11 +299,14 @@ test("the production page shows all four recipes, item icons and credits", () =>
     <ShipUpgradeApp catalog={advanceCatalog} calculatePlan={calculatePlan} />,
   );
   expect(html.match(/Recipe source \(BDO Codex\)/g)).toHaveLength(4);
-  expect(html.match(/<img\b/g)).toHaveLength(26);
-  expect(html).toContain("180 × Bright Reef Piece");
-  expect(html).toContain("Verisha Cannon +10");
+  expect(html.match(/<article[^>]*data-gear-pair=/g)).toHaveLength(4);
+  expect(html.match(/<details open=""/g)).toHaveLength(4);
+  expect(html).toContain(">Bright Reef Piece</span>");
+  expect(html).toContain('src="/ship-upgrade-icons/5828.png"');
+  expect(html).toContain(">Verisha Cannon</label>");
   expect(html).toContain("210,720");
   expect(html).toContain("BDO Atlas");
+  expect(html).toContain('href="https://bdoworkshop.com/carrack-resource-management"');
   expect(html).not.toMatch(/(?:7|8|9|32),000,000/);
   expect(html.match(/Satella Shadow Violet/g)).toHaveLength(2);
   expect(html).toMatch(
@@ -339,8 +346,10 @@ test("owning a blue part hides its green part and recipe without moving other pa
     const groups = [...html.matchAll(/data-gear-pair="([^"]+)"/g)];
     expect(groups.map((group) => group[1])).toEqual(["49655", "49656", "49657", "49658"]);
     const cannon = html.slice(groups[2].index, groups[3].index);
-    const sail = html.slice(groups[3].index, html.indexOf("Blue equipment recipes"));
+    const sail = html.slice(groups[3].index, html.indexOf("</article>", groups[3].index));
     expect(cannon.includes("Verisha Cannon")).toBe(blueLevel === -1);
+    expect(cannon.includes("<details open")).toBe(blueLevel === -1);
+    expect(cannon.includes("Bright Reef Piece")).toBe(blueLevel === -1);
     expect(cannon).not.toContain("White Wind Sail");
     expect(sail).toContain("White Wind Sail");
     if (blueLevel === -1) {
@@ -348,6 +357,94 @@ test("owning a blue part hides its green part and recipe without moving other pa
         cannon.indexOf(">Verisha Cannon</label>"),
       );
     }
+  }
+});
+
+test("Tidal Black Stones and the box selector only appear when stones are required", () => {
+  for (const complete of [false, true]) {
+    const inventory = {
+      owned: { 756001: 120 },
+      gearLevels: complete ? { 49655: 10, 49656: 10, 49657: 10, 49658: 10 } : {},
+      remainingStoneBoxes: 3,
+    };
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: {
+        cookie: `${INVENTORY_COOKIE_NAME}=${encodeURIComponent(JSON.stringify({ version: 1, inventory }))}`,
+      },
+    });
+    const html = renderToStaticMarkup(
+      <ShipUpgradeApp
+        fleet={fleet}
+        calculatePlan={(route, stock, options) => {
+          expect(stock.owned["756001"]).toBe(120);
+          expect(stock.remainingStoneBoxes).toBe(3);
+          const plan = calculatePlan(route, stock, options);
+          expect(plan.rows.find(({ id }) => id === "756001")).toMatchObject({
+            required: complete ? 0 : 120,
+            missing: 0,
+          });
+          return plan;
+        }}
+      />,
+    );
+    expect(html.includes("Owned Tidal Black Stone")).toBe(!complete);
+    expect(html.includes("Stone boxes remaining this week")).toBe(!complete);
+    expect(html.includes("Shared enhancement materials</h2>")).toBe(!complete);
+  }
+});
+
+test("shared ingredients show piece quantities and one plan-wide shortage", () => {
+  const inventory = { owned: { 5827: 250 } };
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: {
+      cookie: `${INVENTORY_COOKIE_NAME}=${encodeURIComponent(JSON.stringify({ version: 1, inventory }))}`,
+    },
+  });
+  const html = renderToStaticMarkup(
+    <ShipUpgradeApp catalog={advanceCatalog} calculatePlan={calculatePlan} />,
+  );
+  expect(html).toContain("Required for this piece");
+  expect(html).toContain("Missing in plan");
+  const plywood = (html.match(/<tr\b.*?<\/tr>/g) ?? []).filter((row) =>
+    row.includes(">Moon Scale Plywood</span>"),
+  );
+  expect(plywood).toHaveLength(2);
+  for (const row of plywood) {
+    expect(row).toContain('tabular-nums">200</td>');
+    expect(row).toContain('value="250"');
+    expect(row).toContain('tabular-nums">150</td>');
+    expect(row).toContain("2,250 CC");
+  }
+  expect(html).toContain("206,970");
+});
+
+test("sailing source badges expose fixed yields, selectable rewards and other acquisition", () => {
+  const html = renderToStaticMarkup(
+    <ShipUpgradeApp catalog={advanceCatalog} calculatePlan={calculatePlan} />,
+  );
+  expect(html).toContain("Daily quest · +10/day");
+  expect(html).toContain("Daily quest · Up to +4/day");
+  expect(html).toContain("Weekly quest · Up to +19/week");
+  expect(html).toContain("For the Young Otter Merchants: +15 guaranteed on completion.");
+  expect(html).toContain("Candidum Hunter: +4 if you select this reward.");
+  expect(html).toContain("Khan loot");
+  expect(html).toContain("Rare catch at Papua Crinea. No fixed daily yield.");
+  expect(html).toMatch(
+    /aria-describedby="([^"]+-daily)"[^>]*>Daily quest.*?id="\1" role="tooltip"/,
+  );
+  for (const [source, color] of [
+    ["daily", "sky"],
+    ["weekly", "indigo"],
+    ["barter", "emerald"],
+    ["shop", "amber"],
+    ["khan", "rose"],
+    ["fishing", "cyan"],
+  ]) {
+    const badge = html.match(new RegExp(`<button[^>]+aria-describedby="[^"]+-${source}"[^>]*>`));
+    expect(badge?.[0]).toContain(`bg-${color}-100`);
+    expect(badge?.[0]).toContain(`dark:bg-${color}-950`);
   }
 });
 

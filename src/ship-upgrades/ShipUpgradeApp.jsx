@@ -8,6 +8,7 @@ import { SiteHeader } from "../components/SiteHeader";
 import { getSitePaths } from "../components/SiteNavigation";
 import { useTheme } from "../hooks/useTheme";
 import { useLanguage } from "../i18n/LanguageContext";
+import { MaterialSources } from "./MaterialSources";
 import {
   MAX_FRAGMENT_PRICE,
   MAX_QUANTITY,
@@ -17,6 +18,7 @@ import {
   resetInventory,
   saveInventory,
 } from "./inventory";
+import { sailingMaterials, sailingSources } from "./sailingSources";
 
 const levelOptions = Array.from({ length: 11 }, (_, level) => level);
 const panelClass =
@@ -116,7 +118,7 @@ function GearControl({ gear, level, row, onChange }) {
   const targetLevel = gear.targetLevel ?? 10;
   const selectId = useId();
   return (
-    <div className="rounded-xl border border-slate-200 p-4 dark:border-satella-border">
+    <div className="p-4">
       <div className="mb-3 flex items-start gap-3">
         <ItemIcon icon={gear.icon} />
         <div className="min-w-0">
@@ -167,52 +169,9 @@ function GearControl({ gear, level, row, onChange }) {
       {required && (
         <div className="mt-2 text-xs text-slate-600 dark:text-slate-300">
           {level >= 0 ? <p>{t("Base part owned")}</p> : <Acquisition row={row} shop={gear.shop} />}
-          {level < 0 && gear.source && <p className="mt-1">{t(gear.source)}</p>}
+          {level < 0 && gear.source && <MaterialSources vendor={gear.source} />}
         </div>
       )}
-    </div>
-  );
-}
-
-function EquipmentRecipes({ gear, items, rowsById }) {
-  const { t, formatNumber } = useUpgradeText();
-  const recipes = gear.filter(
-    ({ id }) => items[id]?.recipe && rowsById.get(id)?.status === "craft",
-  );
-  if (recipes.length === 0) return null;
-
-  return (
-    <div className="mt-5 space-y-2">
-      <h3 className="font-semibold">{t("Blue equipment recipes")}</h3>
-      <p className="text-sm text-slate-600 dark:text-slate-300">
-        {t(
-          "Craft in the level 4 Ship Part Workshop at Port Epheria 1-4, 2F. Each piece starts at +0.",
-        )}
-      </p>
-      {recipes.map(({ id, name }) => {
-        const { ingredients, source } = items[id].recipe;
-        return (
-          <details
-            key={id}
-            className="rounded-lg border border-slate-200 dark:border-satella-border"
-          >
-            <summary className="cursor-pointer px-3 py-2 text-sm font-semibold">{t(name)}</summary>
-            <ul className="space-y-1 px-3 pb-3 text-sm text-slate-600 dark:text-slate-300">
-              {Object.entries(ingredients).map(([ingredientId, quantity]) => (
-                <li key={ingredientId}>
-                  {formatNumber(quantity)} × {t(items[ingredientId].name)}
-                  {gear.some((part) => part.id === ingredientId) && " +10"}
-                </li>
-              ))}
-            </ul>
-            {source && (
-              <a href={source} className="mb-3 ml-3 inline-block text-xs font-semibold underline">
-                {t("Recipe source (BDO Codex)")}
-              </a>
-            )}
-          </details>
-        );
-      })}
     </div>
   );
 }
@@ -289,7 +248,7 @@ function formatMaterialCost(item, row, repairSilver, t, formatNumber) {
   return row.cost === null ? t("Unpriced") : t("{price} CC", { price: formatNumber(row.cost) });
 }
 
-function MaterialRow({ item, row, owned, onOwnedChange, repair }) {
+function MaterialRow({ itemId, item, row, pieceRequired, owned, onOwnedChange, repair }) {
   const { t, formatNumber } = useUpgradeText();
   return (
     <tr className="border-t border-slate-200 align-top dark:border-satella-border">
@@ -303,15 +262,19 @@ function MaterialRow({ item, row, owned, onOwnedChange, repair }) {
                 {repair ? t("Ancient Anvil scenario") : t("Minimum stones")}
               </span>
             )}
-            {item.source && (
-              <span className="mt-1 block text-xs text-slate-500 dark:text-slate-400">
-                {t(item.source)}
-              </span>
+            {Object.hasOwn(sailingMaterials, itemId) ? (
+              <MaterialSources itemId={itemId} shop={item.shop} formatNumber={formatNumber} />
+            ) : (
+              item.source && (
+                <span className="mt-1 block text-xs text-slate-500 dark:text-slate-400">
+                  {t(item.source)}
+                </span>
+              )
             )}
           </div>
         </div>
       </th>
-      <td className="px-3 py-4 tabular-nums">{formatNumber(row.required)}</td>
+      <td className="px-3 py-4 tabular-nums">{formatNumber(pieceRequired ?? row.required)}</td>
       <td className="px-3 py-4">
         <QuantityInput
           label={t("Owned {item}", { item: t(item.name) })}
@@ -331,7 +294,7 @@ function MaterialRow({ item, row, owned, onOwnedChange, repair }) {
   );
 }
 
-function MaterialTable({ materials, rowsById, owned, onOwnedChange, repair }) {
+function MaterialTable({ materials, rowsById, owned, onOwnedChange, repair, pieceQuantities }) {
   const { t } = useLanguage();
   if (materials.length === 0) return null;
   return (
@@ -347,25 +310,32 @@ function MaterialTable({ materials, rowsById, owned, onOwnedChange, repair }) {
         </caption>
         <thead className="bg-slate-50 text-xs text-slate-600 dark:bg-satella-base dark:text-slate-300">
           <tr>
-            {["Item", "Required", "Owned", "Missing", "Acquisition", "Purchase cost"].map(
-              (heading) => (
-                <th
-                  key={heading}
-                  scope="col"
-                  className={`px-3 py-3 font-semibold ${heading === "Purchase cost" ? "text-right" : "text-left"}`}
-                >
-                  {t(heading)}
-                </th>
-              ),
-            )}
+            {[
+              t("Item"),
+              pieceQuantities ? t("Required for this piece") : t("Required"),
+              t("Owned"),
+              pieceQuantities ? t("Missing in plan") : t("Missing"),
+              t("Acquisition"),
+              pieceQuantities ? t("Item cost in plan") : t("Purchase cost"),
+            ].map((heading, index, headings) => (
+              <th
+                key={heading}
+                scope="col"
+                className={`px-3 py-3 font-semibold ${index === headings.length - 1 ? "text-right" : "text-left"}`}
+              >
+                {heading}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {materials.map(([id, item]) => (
             <MaterialRow
               key={id}
+              itemId={id}
               item={item}
               owned={owned[id] ?? 0}
+              pieceRequired={pieceQuantities?.[id]}
               row={rowsById.get(id) ?? { required: 0, missing: 0 }}
               onOwnedChange={(quantity) => onOwnedChange(id, quantity)}
               repair={repair}
@@ -577,17 +547,23 @@ export function ShipUpgradeApp({ catalog: singleCatalog, fleet, calculatePlan })
   const rowsById = new Map(plan.rows.map((row) => [row.id, row]));
   const gearGroups = groupEquipment(catalog);
   const gearIds = new Set(catalog.gear.map((gear) => gear.id));
+  const recipeMaterialIds = new Set(
+    catalog.gear.flatMap(({ id }) => Object.keys(catalog.items[id].recipe?.ingredients ?? {})),
+  );
   const materials = Object.entries(catalog.items).filter(
     ([id, item]) => !gearIds.has(id) && (plan.repair || item.category !== "repair"),
   );
   const equipmentMaterials = materials.filter(
-    ([id]) => !Object.hasOwn(catalog.requirements ?? {}, id),
+    ([id, item]) =>
+      !Object.hasOwn(catalog.requirements ?? {}, id) &&
+      !recipeMaterialIds.has(id) &&
+      (!item.hideWhenNotRequired || rowsById.get(id)?.required > 0),
   );
   const shipMaterials = materials.filter(([id]) => Object.hasOwn(catalog.requirements ?? {}, id));
   const shipGear = catalog.gear.filter(({ id }) => Object.hasOwn(catalog.requirements ?? {}, id));
   const hasRecipes = catalog.gear.some(({ id }) => catalog.items[id].recipe);
   const hasKnownCrowShop = !fleet || materials.some(([, item]) => item.shop?.unitPrice > 0);
-  const hasStoneBoxes = !fleet || materials.some(([, item]) => item.shop?.bundle);
+  const hasStoneBoxes = equipmentMaterials.some(([, item]) => item.shop?.bundle);
   const boxesId = useId();
 
   useEffect(() => {
@@ -759,38 +735,87 @@ export function ShipUpgradeApp({ catalog: singleCatalog, fleet, calculatePlan })
                     )
                   : t("The base equipment is enough for this upgrade. No enhancement is required.")}
             </p>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {hasRecipes &&
+              gearGroups.some(([part]) => rowsById.get(part.id)?.status === "craft") && (
+                <p className="mb-4 text-xs text-slate-500 dark:text-slate-400">
+                  {t(
+                    "Each recipe shows what that piece needs. Owned amounts, shortages, and costs are shared across the whole plan.",
+                  )}
+                </p>
+              )}
+            <div className={hasRecipes ? "grid gap-3" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-4"}>
               {gearGroups.map((group) => {
                 const visible = group.filter(
                   ({ id, tier }) => tier !== "green" || rowsById.get(id)?.required !== 0,
                 );
                 if (visible.length === 0) return null;
-                const [firstPart] = group;
+                const [part, ...baseParts] = visible;
+                const recipe =
+                  rowsById.get(part.id)?.status === "craft" ? catalog.items[part.id].recipe : null;
+                const renderGearControl = (gear) => (
+                  <GearControl
+                    key={gear.id}
+                    gear={{ ...catalog.items[gear.id], ...gear }}
+                    level={inventory.gearLevels[gear.id] ?? -1}
+                    row={rowsById.get(gear.id)}
+                    onChange={(level) =>
+                      setInventory((previous) => ({
+                        ...previous,
+                        gearLevels: { ...previous.gearLevels, [gear.id]: level },
+                      }))
+                    }
+                  />
+                );
                 return (
-                  <div
-                    key={firstPart.id}
-                    data-gear-pair={firstPart.id}
-                    className="grid gap-3 sm:row-span-2 sm:grid-rows-subgrid"
+                  <article
+                    key={part.id}
+                    data-gear-pair={part.id}
+                    className="min-w-0 rounded-xl border border-slate-200 dark:border-satella-border"
                   >
-                    {visible.map((gear) => (
-                      <GearControl
-                        key={gear.id}
-                        gear={{ ...catalog.items[gear.id], ...gear }}
-                        level={inventory.gearLevels[gear.id] ?? -1}
-                        row={rowsById.get(gear.id)}
-                        onChange={(level) =>
-                          setInventory((previous) => ({
-                            ...previous,
-                            gearLevels: { ...previous.gearLevels, [gear.id]: level },
-                          }))
-                        }
-                      />
-                    ))}
-                  </div>
+                    {renderGearControl(part)}
+                    {recipe && (
+                      <details
+                        open
+                        className="group border-t border-slate-200 dark:border-satella-border"
+                      >
+                        <summary className="flex cursor-pointer list-none items-center justify-between rounded-b-xl px-4 py-2 text-sm font-semibold hover:bg-purple-50 focus-visible:outline-2 focus-visible:outline-purple-500 dark:hover:bg-satella-hover">
+                          {t("Materials for {item}", { item: t(part.name) })}
+                          <ChevronDown
+                            aria-hidden="true"
+                            className="h-4 w-4 shrink-0 group-open:rotate-180"
+                          />
+                        </summary>
+                        <div className="px-4 pb-4">
+                          {baseParts.length > 0 && (
+                            <div className="rounded-xl border border-slate-200 dark:border-satella-border">
+                              {baseParts.map(renderGearControl)}
+                            </div>
+                          )}
+                          <MaterialTable
+                            materials={Object.keys(recipe.ingredients)
+                              .filter((id) => !gearIds.has(id))
+                              .map((id) => [id, catalog.items[id]])}
+                            pieceQuantities={recipe.ingredients}
+                            rowsById={rowsById}
+                            owned={inventory.owned}
+                            onOwnedChange={updateOwned}
+                          />
+                          <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                            {t(
+                              "Craft in the level 4 Ship Part Workshop at Port Epheria 1-4, 2F. Each piece starts at +0.",
+                            )}
+                            {" · "}
+                            <a href={recipe.source} className="font-semibold underline">
+                              {t("Recipe source (BDO Codex)")}
+                            </a>
+                          </p>
+                        </div>
+                      </details>
+                    )}
+                  </article>
                 );
               })}
             </div>
-            <EquipmentRecipes gear={catalog.gear} items={catalog.items} rowsById={rowsById} />
           </section>
 
           {plan.repair && (
@@ -809,12 +834,10 @@ export function ShipUpgradeApp({ catalog: singleCatalog, fleet, calculatePlan })
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h2 id="materials-heading" className="text-lg font-bold">
-                    {t("Equipment materials & purchase plan")}
+                    {t("Shared enhancement materials")}
                   </h2>
                   <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                    {t(
-                      "Enter what you own. Fully owned and currently unused materials stay editable.",
-                    )}
+                    {t("Enter the quantities you already own.")}
                   </p>
                 </div>
                 {hasStoneBoxes && (
@@ -927,6 +950,13 @@ export function ShipUpgradeApp({ catalog: singleCatalog, fleet, calculatePlan })
               </a>
               {". "}
               {t("Listed shop prices also checked against community screenshots where available.")}
+            </p>
+            <p>
+              {t("Per-piece layout and gathering guide inspired by")}{" "}
+              <a className="underline" href={sailingSources.guide}>
+                BDO Workshop
+              </a>
+              . {t("Quest rewards checked against BDO Codex. Some rewards must be selected.")}
             </p>
             <p>
               {t("Game artwork by Pearl Abyss. Icon sources:")}{" "}

@@ -1,4 +1,55 @@
 export default {
+  "Required for this piece": "이 부품에 필요한 수량",
+  "Missing in plan": "전체 계획의 부족 수량",
+  "Item cost in plan": "전체 계획의 아이템 비용",
+  "Each recipe shows what that piece needs. Owned amounts, shortages, and costs are shared across the whole plan.":
+    "각 제작식은 해당 부품에 필요한 재료를 표시합니다. 보유 수량, 부족 수량, 비용은 전체 계획에서 공유됩니다.",
+  "Materials for {item}": "{item} 재료",
+  "Shared enhancement materials": "공통 강화 재료",
+  "Per-piece layout and gathering guide inspired by": "부품별 구성과 재료 수집 안내 참고:",
+  "Quest rewards checked against BDO Codex. Some rewards must be selected.":
+    "의뢰 보상은 BDO Codex와 대조했습니다. 일부 보상은 선택해야 합니다.",
+  "Up to +{count}/day": "하루 최대 +{count}",
+  "+{count}/day": "하루 +{count}",
+  "Up to +{count}/week": "주간 최대 +{count}",
+  "+{count}/week": "주간 +{count}",
+  "Daily quest": "일일 의뢰",
+  "Weekly quest": "주간 의뢰",
+  "{quest}: +{count} if you select this reward.": "{quest}: 이 보상을 선택하면 +{count}.",
+  "{quest}: +{count} guaranteed on completion.": "{quest}: 완료 시 +{count} 확정 획득.",
+  Bartering: "물물교환",
+  "Exchange sea trade goods when an offer is available.":
+    "교환 목록에 나타나면 해상 교역품을 교환하세요.",
+  "Exchange level {level} sea trade goods when an offer is available.":
+    "교환 목록에 나타나면 {level}단계 해상 교역품을 교환하세요.",
+  "Crow Coin Shop": "까마귀 주화 상점",
+  "Khan loot": "칸 전리품",
+  "Dry one {item} to get {quantity} of this material.":
+    "{item} 1개를 말리면 이 재료 {quantity}개를 얻습니다.",
+  "Exploration quest": "탐험 의뢰",
+  "Check island exploration quests for this reward. No fixed daily yield.":
+    "이 보상을 주는 섬 탐험 의뢰를 확인하세요. 일일 획득량은 정해져 있지 않습니다.",
+  Fishing: "낚시",
+  "Rare catch at Papua Crinea. No fixed daily yield.":
+    "파푸아크리니에서 드물게 낚입니다. 일일 획득량은 정해져 있지 않습니다.",
+  "Sea monster drop": "해양 괴수 전리품",
+  "Can drop from sea monsters. No fixed daily yield.":
+    "해양 괴수에게서 획득할 수 있습니다. 일일 획득량은 정해져 있지 않습니다.",
+  "NPC vendor": "NPC 상인",
+  "Old Moon Guild's Young Sea Monster Hunter": "그믐달 길드의 어린 해양 괴수 사냥꾼",
+  "Win-win Situation": "서로에게 이로운 일",
+  "Our Guild is Not a Charity Group": "우리 길드는 자선 단체가 아니다",
+  "Do You Have What it Takes?": "자격이 있는가?",
+  "Lively Iliya Island": "활기찬 일리야 섬",
+  "Supplies Delivery (Iliya Island)": "물자 운송 (일리야 섬)",
+  "Supplies Delivery (Oquilla's Eye)": "물자 운송 (오킬루아의 눈)",
+  "For the Young Otter Merchants": "어린 해달 상인들을 위하여",
+  "Old Moon Guild's Candidum Hunter": "그믐달 길드의 칸디둠 사냥꾼",
+  "Old Moon Guild's Nineshark Hunter": "그믐달 길드의 나인샤크 사냥꾼",
+  "Old Moon Guild's Black Rust Hunter": "그믐달 길드의 검은무쇠이빨 사냥꾼",
+  "Monster Increase Report": "괴수 증가 보고",
+  "Khan's Tendon": "칸의 힘줄",
+  "Khan's Scale": "칸의 비늘",
   "Ship Upgrade": "선박 증축",
   "Ship Equipment": "선박 장비",
   Calculators: "계산기",
@@ -32,7 +83,6 @@ export default {
   "Required for this plan": "이 경로에 필요",
   "Not currently required": "현재 필요 없음",
   "Base part owned": "장비 보유 중",
-  "Blue equipment recipes": "파란색 등급 장비 제작식",
   "Craft in the level 4 Ship Part Workshop at Port Epheria 1-4, 2F. Each piece starts at +0.":
     "에페리아 항구 1-4번지 2층의 4단계 선박 부품 공방에서 제작하세요. 제작한 장비는 +0부터 시작합니다.",
   "Recipe source (BDO Codex)": "제작식 출처 (BDO Codex)",
@@ -115,9 +165,7 @@ export default {
     "현재 장비 강화 단계를 입력하세요. 이 경로의 강화는 모두 확정 성공입니다.",
   "The base equipment is enough for this upgrade. No enhancement is required.":
     "이 증축에는 기본 장비만 있으면 됩니다. 강화는 필요하지 않습니다.",
-  "Equipment materials & purchase plan": "장비 재료 및 구매 계획",
-  "Enter what you own. Fully owned and currently unused materials stay editable.":
-    "보유 수량을 입력하세요. 필요한 수량을 모두 보유했거나 현재 사용하지 않는 재료도 수정할 수 있습니다.",
+  "Enter the quantities you already own.": "보유 수량을 입력하세요.",
   "Stone boxes remaining this week": "이번 주 강화석 상자 구매 잔여 횟수",
   "0–10 available purchases. Update this manually when your weekly allowance changes.":
     "0~10회 구매할 수 있습니다. 주간 구매 가능 횟수가 바뀌면 직접 수정하세요.",

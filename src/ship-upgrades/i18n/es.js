@@ -1,4 +1,57 @@
 export default {
+  "Required for this piece": "Necesarios para esta pieza",
+  "Missing in plan": "Faltan en el plan",
+  "Item cost in plan": "Coste del objeto en el plan",
+  "Each recipe shows what that piece needs. Owned amounts, shortages, and costs are shared across the whole plan.":
+    "Cada receta muestra lo que necesita esa pieza. Las existencias, las cantidades que faltan y los costes se calculan para todo el plan.",
+  "Materials for {item}": "Materiales para {item}",
+  "Shared enhancement materials": "Materiales de refuerzo compartidos",
+  "Per-piece layout and gathering guide inspired by":
+    "Diseño por pieza y guía de obtención inspirados en",
+  "Quest rewards checked against BDO Codex. Some rewards must be selected.":
+    "Recompensas de misiones contrastadas con BDO Codex. Algunas deben elegirse.",
+  "Up to +{count}/day": "Hasta +{count}/día",
+  "+{count}/day": "+{count}/día",
+  "Up to +{count}/week": "Hasta +{count}/semana",
+  "+{count}/week": "+{count}/semana",
+  "Daily quest": "Misión diaria",
+  "Weekly quest": "Misión semanal",
+  "{quest}: +{count} if you select this reward.": "{quest}: +{count} si eliges esta recompensa.",
+  "{quest}: +{count} guaranteed on completion.": "{quest}: +{count} al completar la misión.",
+  Bartering: "Trueque",
+  "Exchange sea trade goods when an offer is available.":
+    "Intercambia mercancías marítimas cuando haya una oferta disponible.",
+  "Exchange level {level} sea trade goods when an offer is available.":
+    "Intercambia mercancías marítimas de nivel {level} cuando haya una oferta disponible.",
+  "Crow Coin Shop": "Tienda de corvarios",
+  "Khan loot": "Botín de Kaniwha",
+  "Dry one {item} to get {quantity} of this material.":
+    "Seca 1 unidad de «{item}» para obtener {quantity} de este material.",
+  "Exploration quest": "Misión de exploración",
+  "Check island exploration quests for this reward. No fixed daily yield.":
+    "Consulta las misiones de exploración de las islas. No hay una cantidad diaria fija.",
+  Fishing: "Pesca",
+  "Rare catch at Papua Crinea. No fixed daily yield.":
+    "Captura poco frecuente en Papua Crinea. No hay una cantidad diaria fija.",
+  "Sea monster drop": "Botín de monstruos marinos",
+  "Can drop from sea monsters. No fixed daily yield.":
+    "Puede obtenerse de monstruos marinos. No hay una cantidad diaria fija.",
+  "NPC vendor": "PNJ vendedor",
+  "Old Moon Guild's Young Sea Monster Hunter":
+    "Cazador de crías de monstruos marinos del Gremio Luna Vieja",
+  "Win-win Situation": "Todos ganamos",
+  "Our Guild is Not a Charity Group": "Nuestro gremio no es una organización benéfica",
+  "Do You Have What it Takes?": "¿Estás a la altura?",
+  "Lively Iliya Island": "La animada isla Iliya",
+  "Supplies Delivery (Iliya Island)": "Entrega de suministros (isla Iliya)",
+  "Supplies Delivery (Oquilla's Eye)": "Entrega de suministros (Ojo de Oquilla)",
+  "For the Young Otter Merchants": "Para las jóvenes nutrias comerciantes",
+  "Old Moon Guild's Candidum Hunter": "Cazador de Candidum del Gremio Luna Vieja",
+  "Old Moon Guild's Nineshark Hunter": "Cazador de Nineshark del Gremio Luna Vieja",
+  "Old Moon Guild's Black Rust Hunter": "Cazador de Óxido Negro del Gremio Luna Vieja",
+  "Monster Increase Report": "Informe sobre el aumento de monstruos",
+  "Khan's Tendon": "Tendón de Kaniwha",
+  "Khan's Scale": "Escama de Kaniwha",
   "Ship Upgrade": "Mejora del barco",
   "Ship Equipment": "Equipamiento del barco",
   Calculators: "Calculadoras",
@@ -32,7 +85,6 @@ export default {
   "Required for this plan": "Necesario para esta mejora",
   "Not currently required": "No se necesita ahora",
   "Base part owned": "Pieza base en inventario",
-  "Blue equipment recipes": "Recetas de equipamiento azul",
   "Craft in the level 4 Ship Part Workshop at Port Epheria 1-4, 2F. Each piece starts at +0.":
     "Fabrica las piezas en el taller naval de nivel 4 del puerto de Epheria (1-4, 2.ª planta). Cada pieza empieza en +0.",
   "Recipe source (BDO Codex)": "Fuente de la receta (BDO Codex)",
@@ -116,9 +168,7 @@ export default {
     "Introduce tus niveles de refuerzo. En esta ruta, todos los refuerzos tienen éxito garantizado.",
   "The base equipment is enough for this upgrade. No enhancement is required.":
     "El equipamiento base basta para esta mejora; no hace falta reforzarlo.",
-  "Equipment materials & purchase plan": "Materiales de equipamiento y plan de compra",
-  "Enter what you own. Fully owned and currently unused materials stay editable.":
-    "Indica las cantidades que tienes. Puedes seguir editando los materiales que ya tienes completos o no necesitas ahora.",
+  "Enter the quantities you already own.": "Indica las cantidades que ya tienes.",
   "Stone boxes remaining this week": "Cajas de piedras disponibles esta semana",
   "0–10 available purchases. Update this manually when your weekly allowance changes.":
     "De 0 a 10 compras disponibles. Actualiza esta cifra cuando cambie tu cupo semanal.",

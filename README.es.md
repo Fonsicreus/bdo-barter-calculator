@@ -60,6 +60,8 @@ En la versión 2.0 puedes planificar **13 mejoras de embarcadero**, desde el vel
 
 Datos y nombres: [BDO Codex](https://bdocodex.com/es/). Precios: [actualización de Pearl Abyss para PC Asia](https://blackdesert.pearlabyss.com/Asia/en-US/News/Notice/Detail?_boardNo=13225) y capturas de la comunidad. Comprueba los precios y los límites en tu servidor.
 
+En **Equipamiento del barco**, cada pieza pendiente tiene un desplegable de materiales abierto por defecto que se oculta cuando ya la tienes. Las piezas que repiten ingredientes comparten inventario y cantidades pendientes. Pasa el cursor o toca las etiquetas de obtención para consultar las misiones diarias y semanales y ver qué recompensas son fijas o seleccionables. El diseño y la guía de obtención se inspiran en [BDO Workshop](https://bdoworkshop.com/carrack-resource-management); las recompensas se contrastaron con BDO Codex.
+
 ## Cómo ejecutarlo en local
 
 Instala [Bun](https://bun.sh) y ejecuta estos comandos en la carpeta del proyecto. Abre la dirección local que Vite muestre en la terminal.

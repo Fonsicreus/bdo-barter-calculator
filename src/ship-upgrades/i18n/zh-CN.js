@@ -1,4 +1,54 @@
 export default {
+  "Required for this piece": "此部件所需",
+  "Missing in plan": "整条路线缺少",
+  "Item cost in plan": "此道具在整条路线中的费用",
+  "Each recipe shows what that piece needs. Owned amounts, shortages, and costs are shared across the whole plan.":
+    "每份配方列出该部件所需材料。已有数量、缺少数量和费用按整条路线共用。",
+  "Materials for {item}": "{item}所需材料",
+  "Shared enhancement materials": "共用强化材料",
+  "Per-piece layout and gathering guide inspired by": "部件布局与材料获取指南参考了",
+  "Quest rewards checked against BDO Codex. Some rewards must be selected.":
+    "任务奖励已与 BDO Codex 核对。部分奖励需要自行选择。",
+  "Up to +{count}/day": "每天最多 +{count}",
+  "+{count}/day": "每天 +{count}",
+  "Up to +{count}/week": "每周最多 +{count}",
+  "+{count}/week": "每周 +{count}",
+  "Daily quest": "每日任务",
+  "Weekly quest": "每周任务",
+  "{quest}: +{count} if you select this reward.": "{quest}：选择此奖励可获得 +{count}。",
+  "{quest}: +{count} guaranteed on completion.": "{quest}：完成任务必得 +{count}。",
+  Bartering: "以物易物",
+  "Exchange sea trade goods when an offer is available.":
+    "出现可用兑换项目时，可用海上贸易品以物易物。",
+  "Exchange level {level} sea trade goods when an offer is available.":
+    "出现可用兑换项目时，可用 {level} 级海上贸易品以物易物。",
+  "Crow Coin Shop": "乌鸦硬币商店",
+  "Khan loot": "坎的战利品",
+  "Dry one {item} to get {quantity} of this material.":
+    "晾晒 1 个{item}可获得 {quantity} 个此材料。",
+  "Exploration quest": "探索任务",
+  "Check island exploration quests for this reward. No fixed daily yield.":
+    "查看岛屿探索任务是否提供此奖励。每天没有固定获取数量。",
+  Fishing: "钓鱼",
+  "Rare catch at Papua Crinea. No fixed daily yield.":
+    "在帕普阿克里尼亚有较低概率钓获。每天没有固定获取数量。",
+  "Sea monster drop": "海怪掉落",
+  "Can drop from sea monsters. No fixed daily yield.": "海怪可能掉落。每天没有固定获取数量。",
+  "NPC vendor": "NPC 商人",
+  "Old Moon Guild's Young Sea Monster Hunter": "残月公会的幼年海怪猎人",
+  "Win-win Situation": "双赢局面",
+  "Our Guild is Not a Charity Group": "我们公会不是慈善团体",
+  "Do You Have What it Takes?": "你有这个本事吗？",
+  "Lively Iliya Island": "热闹的伊利亚岛",
+  "Supplies Delivery (Iliya Island)": "运送补给品（伊利亚岛）",
+  "Supplies Delivery (Oquilla's Eye)": "运送补给品（奥基鲁阿之眼）",
+  "For the Young Otter Merchants": "为了年轻的水獭商人",
+  "Old Moon Guild's Candidum Hunter": "残月公会的坎迪杜姆猎人",
+  "Old Moon Guild's Nineshark Hunter": "残月公会的九鲨猎人",
+  "Old Moon Guild's Black Rust Hunter": "残月公会的黑铁牙猎人",
+  "Monster Increase Report": "海怪数量增加报告",
+  "Khan's Tendon": "坎的筋腱",
+  "Khan's Scale": "坎的鳞片",
   "Ship Upgrade": "船舶扩建",
   "Ship Equipment": "船舶装备",
   Calculators: "计算器",
@@ -32,7 +82,6 @@ export default {
   "Required for this plan": "此路线需要",
   "Not currently required": "当前不需要",
   "Base part owned": "已拥有基础部件",
-  "Blue equipment recipes": "蓝色品质装备制作配方",
   "Craft in the level 4 Ship Part Workshop at Port Epheria 1-4, 2F. Each piece starts at +0.":
     "在艾裴里亚港口村 1-4 号二楼的 4 级船舶部件工坊制作。制成的部件从 +0 开始。",
   "Recipe source (BDO Codex)": "配方来源（BDO Codex）",
@@ -111,9 +160,7 @@ export default {
     "输入当前装备强化等级。此路线中的强化均必定成功。",
   "The base equipment is enough for this upgrade. No enhancement is required.":
     "此扩建只需要基础装备，无需强化。",
-  "Equipment materials & purchase plan": "装备材料与购买计划",
-  "Enter what you own. Fully owned and currently unused materials stay editable.":
-    "输入已有数量。已备齐或暂时不用的材料仍可编辑。",
+  "Enter the quantities you already own.": "请输入已有数量。",
   "Stone boxes remaining this week": "本周还可购买的强化石箱数",
   "0–10 available purchases. Update this manually when your weekly allowance changes.":
     "可购买 0 至 10 箱。每周购买额度变化时，请手动更新。",
